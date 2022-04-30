@@ -7,6 +7,7 @@ import MovieCardView from '../view/movie-card-view';
 import MoviesExtraView from '../view/movies-extra-view';
 import {render} from '../render.js';
 
+
 export default class MoviesPresenter {
   moviesComponent = new MoviesView();
   moviesList = new MoviesList();
@@ -16,17 +17,18 @@ export default class MoviesPresenter {
   moviesListContainerRated = new MoviesListContainerView();
   moviesListContainerCommented = new MoviesListContainerView();
 
-  init = (moviesContainer, heading) => {
+  init = (moviesContainer, moviesModel) => {
     this.moviesContainer = moviesContainer;
-    this.heading = heading;
+    this.moviesModel = moviesModel;
+    this.movies = [...this.moviesModel.getMovies()];
 
     render(new SortView(), this.moviesContainer);
     render(this.moviesComponent, this.moviesContainer);
     render(this.moviesList, this.moviesComponent.getElement());
     render(this.moviesListContainer, this.moviesList.getElement());
 
-    for (let i = 0; i < 5; i++) {
-      render(new MovieCardView(), this.moviesListContainer.getElement());
+    for (let i = 0; i < this.movies.length; i++) {
+      render(new MovieCardView(this.movies[i]), this.moviesListContainer.getElement());
     }
 
     render(new ButtonShowMoreView(), this.moviesList.getElement());

@@ -1,7 +1,7 @@
 import {createElement} from '../render.js';
 
 const createPopupTemplate = () => (
-  `<section class="film-details">
+  `<section class="film-details" style="display:none;">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
         <div class="film-details__close">
