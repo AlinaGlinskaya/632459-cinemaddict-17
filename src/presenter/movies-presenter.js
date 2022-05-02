@@ -24,6 +24,7 @@ export default class MoviesPresenter {
     this.moviesModel = moviesModel;
     this.popupContainer = popupContainer;
     this.movies = [...this.moviesModel.getMovies()];
+    this.comments = [...this.moviesModel.getComments()];
 
     render(new SortView(), this.moviesContainer);
     render(this.moviesComponent, this.moviesContainer);
@@ -48,7 +49,7 @@ export default class MoviesPresenter {
       render(new MovieCardView(this.movies[i]), this.moviesListContainerCommented.getElement());
     }
 
-    render(new PopupView(this.movies[1]), popupContainer, RenderPosition.AFTEREND);
+    render(new PopupView(this.movies[0], this.comments), popupContainer, RenderPosition.AFTEREND);
 
   };
 }

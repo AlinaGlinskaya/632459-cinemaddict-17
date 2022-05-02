@@ -9,6 +9,7 @@ const getRandomInteger = (a = 0, b = 1) => {
 
 const humanizeMovieReleaseYearDate = (date) => dayjs(date).format('YYYY');
 const humanizeMovieReleaseDate = (date) => dayjs(date).format('DD MMMM YYYY');
+const humanizeCommentDate = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
 
 const getTimeFromMins = (mins) => {
   const hours = Math.trunc(mins/60);
@@ -16,4 +17,4 @@ const getTimeFromMins = (mins) => {
   return hours === 0 ? `${minutes}m` : `${hours}h ${minutes}m`;
 };
 
-export {getRandomInteger, humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, getTimeFromMins};
+export {getRandomInteger, humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins};
