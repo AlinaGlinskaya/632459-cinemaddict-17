@@ -14,23 +14,43 @@ const generateDescription = () => {
   return descriptions[randomIndex];
 };
 
+const generatePoster = () => {
+  const posters = [
+    'images/posters/made-for-each-other.png',
+    'images/posters/popeye-meets-sinbad.png',
+    'images/posters/sagebrush-trail.jpg',
+    'images/posters/santa-claus-conquers-the-martians.jpg',
+    'images/posters/the-dance-of-life.jpg',
+    'images/posters/the-great-flamarion.jpg',
+    'images/posters/the-man-with-the-golden-arm.jpg',
+  ];
+
+  const randomIndex = getRandomInteger(0, posters.length - 1);
+
+  return posters[randomIndex];
+
+};
+
 export const generateMovie = () => ({
   id: '0',
-  // comments: [
-  //   $Comment.id$, $Comment.id$
-  // ],
+  comments: [
+    '1', '2'
+  ],
   filmInfo: {
     title: 'A Little Pony Without The Carpet',
     alternativeTitle: 'Laziness Who Sold Themselves',
     totalRating: 5.3,
-    poster: 'images/posters/blue-blazes.jpg',
+    poster: generatePoster(),
     ageRating: 0,
     director: 'Tom Ford',
     writers: [
-      'Takeshi Kitano'
+      'Takeshi Kitano',
+      'Tom Ford'
     ],
     actors: [
-      'Morgan Freeman'
+      'Morgan Freeman',
+      'Mary Beth Hughes',
+      'Erich von Stroheim'
     ],
     release: {
       date: '2019-05-11T00:00:00.000Z',
@@ -38,7 +58,7 @@ export const generateMovie = () => ({
     },
     runtime: 77,
     genre: [
-      'Comedy'
+      'Comedy',
     ],
     description: generateDescription(),
   },
@@ -46,6 +66,6 @@ export const generateMovie = () => ({
     watchlist: false,
     alreadyWatched: true,
     watchingDate: '2019-04-12T16:12:32.554Z',
-    favorite: false
+    favorite: true
   }
 });

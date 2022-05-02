@@ -6,7 +6,8 @@ import MoviesListContainerView from '../view/movies-list-container-view';
 import MovieCardView from '../view/movie-card-view';
 import MoviesExtraView from '../view/movies-extra-view';
 import {render} from '../render.js';
-
+import PopupView from '../view/popup-veiw';
+import {RenderPosition} from '../render.js';
 
 export default class MoviesPresenter {
   moviesComponent = new MoviesView();
@@ -16,10 +17,12 @@ export default class MoviesPresenter {
   moviesExtraListCommented = new MoviesExtraView('Most commented');
   moviesListContainerRated = new MoviesListContainerView();
   moviesListContainerCommented = new MoviesListContainerView();
+  popupView = new PopupView();
 
-  init = (moviesContainer, moviesModel) => {
+  init = (moviesContainer, moviesModel, popupContainer) => {
     this.moviesContainer = moviesContainer;
     this.moviesModel = moviesModel;
+    this.popupContainer = popupContainer;
     this.movies = [...this.moviesModel.getMovies()];
 
     render(new SortView(), this.moviesContainer);
@@ -35,14 +38,17 @@ export default class MoviesPresenter {
 
     render(this.moviesExtraListRated, this.moviesComponent.getElement());
     render(this.moviesListContainerRated, this.moviesExtraListRated.getElement());
-    for (let i = 0; i < 2; i++) {
-      render(new MovieCardView(), this.moviesListContainerRated.getElement());
+    for (let i = 0; i < this.movies.length && i < 2; i++) {
+      render(new MovieCardView(this.movies[i]), this.moviesListContainerRated.getElement());
     }
 
     render(this.moviesExtraListCommented, this.moviesComponent.getElement());
     render(this.moviesListContainerCommented, this.moviesExtraListCommented.getElement());
-    for (let i = 0; i < 2; i++) {
-      render(new MovieCardView(), this.moviesListContainerCommented.getElement());
+    for (let i = 3; i < this.movies.length && i < 5; i++) {
+      render(new MovieCardView(this.movies[i]), this.moviesListContainerCommented.getElement());
     }
+
+    render(new PopupView(this.movies[1]), popupContainer, RenderPosition.AFTEREND);
+
   };
 }
