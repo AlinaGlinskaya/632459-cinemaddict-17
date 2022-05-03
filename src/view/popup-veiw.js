@@ -2,7 +2,10 @@ import {createElement} from '../render.js';
 import {humanizeMovieReleaseDate, humanizeCommentDate, getTimeFromMins} from '../utils.js';
 import {EMOTIONS} from '../const.js';
 
-const createPopupTemplate = (movie, comments) => {
+const createPopupTemplate = (movie, comments, formData = {}) => {
+  const {
+    smile = 'smile',
+  } = formData;
   const {title, description, totalRating, poster, runtime, ageRating, director} = movie.filmInfo;
   const {releaseCountry} = movie.filmInfo.release;
   const activeMovieDetailsControlsClassname = 'film-details__control-button--active';
@@ -26,8 +29,6 @@ const createPopupTemplate = (movie, comments) => {
 
   const filmDetailsControlsTemplate = createMovieDetailsControlsTemplate(movie.userDetails, activeMovieDetailsControlsClassname);
 
-  //
-
   const commentsAmount = comments.length;
 
   const movieComments = comments.filter((comment) => movie.comments.includes(comment.id));
@@ -49,13 +50,13 @@ const createPopupTemplate = (movie, comments) => {
 
   const commentsListTemplate = createCommentsListTemplate(movieComments);
 
-  const createCommentEmotionsTemplate = (currentEmotion) => EMOTIONS.map((emotion) =>
-    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${currentEmotion === emotion ? 'checked' : ''}>
+  const createCommentEmotionsTemplate = (currentSmile) => EMOTIONS.map((emotion) =>
+    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${currentSmile === emotion ? 'checked' : ''}>
     <label class="film-details__emoji-label" for="emoji-${emotion}">
       <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
     </label>`).join('');
 
-  const commentEmotionsTemplate = createCommentEmotionsTemplate();
+  const commentEmotionsTemplate = createCommentEmotionsTemplate(smile);
 
   return (`<section class="film-details"">
     <form class="film-details__inner" action="" method="get">
@@ -150,13 +151,14 @@ const createPopupTemplate = (movie, comments) => {
 };
 
 export default class PopupView {
-  constructor(movie, comments) {
+  constructor(movie, comments, formData) {
     this.movie = movie;
     this.comments = comments;
+    this.formData = formData;
   }
 
   getTemplate() {
-    return createPopupTemplate(this.movie, this.comments);
+    return createPopupTemplate(this.movie, this.comments, this.formData);
   }
 
   getElement() {
