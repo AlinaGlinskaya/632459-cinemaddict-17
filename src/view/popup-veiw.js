@@ -7,7 +7,7 @@ const createPopupTemplate = (movie, comments, formData = {}) => {
     smile = 'smile',
     commentText = 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
   } = formData;
-  const {title, description, totalRating, poster, runtime, ageRating, director} = movie.filmInfo;
+  const {title, alternativeTitle, description, totalRating, poster, runtime, ageRating, director} = movie.filmInfo;
   const {releaseCountry} = movie.filmInfo.release;
   const activeMovieDetailsControlsClassname = 'film-details__control-button--active';
 
@@ -59,7 +59,7 @@ const createPopupTemplate = (movie, comments, formData = {}) => {
 
   const commentEmotionsTemplate = createCommentEmotionsTemplate(smile);
 
-  return (`<section class="film-details"">
+  return (`<section class="film-details">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
         <div class="film-details__close">
@@ -76,7 +76,7 @@ const createPopupTemplate = (movie, comments, formData = {}) => {
             <div class="film-details__info-head">
               <div class="film-details__title-wrap">
                 <h3 class="film-details__title">${title}</h3>
-                <p class="film-details__title-original">Original: ${title}</p>
+                <p class="film-details__title-original">Original: ${alternativeTitle}</p>
               </div>
 
               <div class="film-details__rating">

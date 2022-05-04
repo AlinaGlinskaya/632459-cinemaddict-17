@@ -10,6 +10,12 @@ import PopupView from '../view/popup-veiw';
 import {RenderPosition} from '../render.js';
 
 export default class MoviesPresenter {
+  constructor(popupContainer, moviesContainer, moviesModel) {
+    this.popupContainer = popupContainer;
+    this.moviesContainer = moviesContainer;
+    this.moviesModel = moviesModel;
+  }
+
   moviesComponent = new MoviesView();
   moviesList = new MoviesList();
   moviesListContainer = new MoviesListContainerView();
@@ -19,10 +25,7 @@ export default class MoviesPresenter {
   moviesListContainerCommented = new MoviesListContainerView();
   popupView = new PopupView();
 
-  init(moviesContainer, moviesModel, popupContainer) {
-    this.moviesContainer = moviesContainer;
-    this.moviesModel = moviesModel;
-    this.popupContainer = popupContainer;
+  init() {
     const movies = [...this.moviesModel.setMovies()];
     const comments = [...this.moviesModel.setComments()];
 
@@ -49,7 +52,7 @@ export default class MoviesPresenter {
       render(new MovieCardView(movie), this.moviesListContainerCommented.getElement());
     }
 
-    render(new PopupView(movies[0], comments), popupContainer, RenderPosition.AFTEREND);
+    render(new PopupView(movies[0], comments), this.popupContainer, RenderPosition.AFTEREND);
 
   }
 }

@@ -9,11 +9,12 @@ const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 const siteFooterStatisticsElement = siteFooterElement.querySelector('.footer__statistics');
-const moviesPresenter = new MoviesPresenter();
 const moviesModel = new MoviesModel();
+const moviesPresenter = new MoviesPresenter(siteFooterElement, siteMainElement, moviesModel);
+
 
 render(new UserRankView(), siteHeaderElement);
 render(new MainNavView(), siteMainElement);
 render(new MoviesStaticticsView(), siteFooterStatisticsElement);
 
-moviesPresenter.init(siteMainElement, moviesModel, siteFooterElement);
+moviesPresenter.init();
