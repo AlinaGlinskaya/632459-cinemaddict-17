@@ -19,37 +19,37 @@ export default class MoviesPresenter {
   moviesListContainerCommented = new MoviesListContainerView();
   popupView = new PopupView();
 
-  init = (moviesContainer, moviesModel, popupContainer) => {
+  init(moviesContainer, moviesModel, popupContainer) {
     this.moviesContainer = moviesContainer;
     this.moviesModel = moviesModel;
     this.popupContainer = popupContainer;
-    this.movies = [...this.moviesModel.getMovies()];
-    this.comments = [...this.moviesModel.getComments()];
+    const movies = [...this.moviesModel.setMovies()];
+    const comments = [...this.moviesModel.setComments()];
 
     render(new SortView(), this.moviesContainer);
     render(this.moviesComponent, this.moviesContainer);
     render(this.moviesList, this.moviesComponent.getElement());
     render(this.moviesListContainer, this.moviesList.getElement());
 
-    for (let i = 0; i < this.movies.length; i++) {
-      render(new MovieCardView(this.movies[i]), this.moviesListContainer.getElement());
+    for (const movie of movies) {
+      render(new MovieCardView(movie), this.moviesListContainer.getElement());
     }
 
     render(new ButtonShowMoreView(), this.moviesList.getElement());
 
     render(this.moviesExtraListRated, this.moviesComponent.getElement());
     render(this.moviesListContainerRated, this.moviesExtraListRated.getElement());
-    for (let i = 0; i < this.movies.length && i < 2; i++) {
-      render(new MovieCardView(this.movies[i]), this.moviesListContainerRated.getElement());
+    for (const movie of movies.slice(0,2)) {
+      render(new MovieCardView(movie), this.moviesListContainerRated.getElement());
     }
 
     render(this.moviesExtraListCommented, this.moviesComponent.getElement());
     render(this.moviesListContainerCommented, this.moviesExtraListCommented.getElement());
-    for (let i = 3; i < this.movies.length && i < 5; i++) {
-      render(new MovieCardView(this.movies[i]), this.moviesListContainerCommented.getElement());
+    for (const movie of movies.slice(3,5)) {
+      render(new MovieCardView(movie), this.moviesListContainerCommented.getElement());
     }
 
-    render(new PopupView(this.movies[0], this.comments), popupContainer, RenderPosition.AFTEREND);
+    render(new PopupView(movies[0], comments), popupContainer, RenderPosition.AFTEREND);
 
-  };
+  }
 }

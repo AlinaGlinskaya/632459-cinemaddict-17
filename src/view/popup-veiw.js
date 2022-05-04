@@ -5,6 +5,7 @@ import {EMOTIONS} from '../const.js';
 const createPopupTemplate = (movie, comments, formData = {}) => {
   const {
     smile = 'smile',
+    commentText = 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
   } = formData;
   const {title, description, totalRating, poster, runtime, ageRating, director} = movie.filmInfo;
   const {releaseCountry} = movie.filmInfo.release;
@@ -137,7 +138,7 @@ const createPopupTemplate = (movie, comments, formData = {}) => {
             <div class="film-details__add-emoji-label"></div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value="${commentText}"></textarea>
             </label>
 
             <div class="film-details__emoji-list">

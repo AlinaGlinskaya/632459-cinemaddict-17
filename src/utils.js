@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -12,9 +14,9 @@ const humanizeMovieReleaseDate = (date) => dayjs(date).format('DD MMMM YYYY');
 const humanizeCommentDate = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
 
 const getTimeFromMins = (mins) => {
-  const hours = Math.trunc(mins/60);
-  const minutes = mins % 60;
-  return hours === 0 ? `${minutes}m` : `${hours}h ${minutes}m`;
+  const runtime = dayjs.duration(mins, 'minutes');
+  const hours = runtime.hours();
+  return hours !== 0 ? `${runtime.hours()}h ${runtime.minutes()}m` : `${runtime.minutes()}m`;
 };
 
 export {getRandomInteger, humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins};
