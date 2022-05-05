@@ -15,8 +15,7 @@ const humanizeCommentDate = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
 
 const getTimeFromMins = (mins) => {
   const runtime = dayjs.duration(mins, 'minutes');
-  const hours = runtime.hours();
-  return hours !== 0 ? `${runtime.hours()}h ${runtime.minutes()}m` : `${runtime.minutes()}m`;
+  return runtime.hours() !== 0 ? `${runtime.hours()}h ${runtime.minutes()}m` : `${runtime.minutes()}m`;
 };
 
 export {getRandomInteger, humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins};
