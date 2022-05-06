@@ -1,4 +1,12 @@
 export default class MoviesModel {
-  getMovies = () => this.movies;
-  getComments = () => this.comments;
+  #movies;
+  #comments;
+
+  get movies() {
+    return this.#movies;
+  }
+
+  get comments() {
+    return this.#comments;
+  }
 }

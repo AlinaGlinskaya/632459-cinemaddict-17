@@ -10,12 +10,17 @@ import PopupView from '../view/popup-veiw';
 import {RenderPosition} from '../render.js';
 
 export default class MoviesPresenter {
+  #popupContainer;
+  #moviesContainer;
+  #moviesModel;
+  #movies;
+  #comments;
   constructor(popupContainer, moviesContainer, moviesModel, movies, comments) {
-    this.popupContainer = popupContainer;
-    this.moviesContainer = moviesContainer;
-    this.moviesModel = moviesModel;
-    this.movies = movies;
-    this.comments = comments;
+    this.#popupContainer = popupContainer;
+    this.#moviesContainer = moviesContainer;
+    this.#moviesModel = moviesModel;
+    this.#movies = movies;
+    this.#comments = comments;
   }
 
   moviesComponent = new MoviesView();
@@ -28,33 +33,33 @@ export default class MoviesPresenter {
   popupView = new PopupView();
 
   init() {
-    const movies = [...this.movies];
-    const comments = [...this.comments];
+    const movies = [...this.#movies];
+    const comments = [...this.#comments];
 
-    render(new SortView(), this.moviesContainer);
-    render(this.moviesComponent, this.moviesContainer);
-    render(this.moviesList, this.moviesComponent.getElement());
-    render(this.moviesListContainer, this.moviesList.getElement());
+    render(new SortView(), this.#moviesContainer);
+    render(this.moviesComponent, this.#moviesContainer);
+    render(this.moviesList, this.moviesComponent.element);
+    render(this.moviesListContainer, this.moviesList.element);
 
     for (const movie of movies) {
-      render(new MovieCardView(movie), this.moviesListContainer.getElement());
+      render(new MovieCardView(movie), this.moviesListContainer.element);
     }
 
-    render(new ButtonShowMoreView(), this.moviesList.getElement());
+    render(new ButtonShowMoreView(), this.moviesList.element);
 
-    render(this.moviesExtraListRated, this.moviesComponent.getElement());
-    render(this.moviesListContainerRated, this.moviesExtraListRated.getElement());
+    render(this.moviesExtraListRated, this.moviesComponent.element);
+    render(this.moviesListContainerRated, this.moviesExtraListRated.element);
     for (const movie of movies.slice(0,2)) {
-      render(new MovieCardView(movie), this.moviesListContainerRated.getElement());
+      render(new MovieCardView(movie), this.moviesListContainerRated.element);
     }
 
-    render(this.moviesExtraListCommented, this.moviesComponent.getElement());
-    render(this.moviesListContainerCommented, this.moviesExtraListCommented.getElement());
+    render(this.moviesExtraListCommented, this.moviesComponent.element);
+    render(this.moviesListContainerCommented, this.moviesExtraListCommented.element);
     for (const movie of movies.slice(3,5)) {
-      render(new MovieCardView(movie), this.moviesListContainerCommented.getElement());
+      render(new MovieCardView(movie), this.moviesListContainerCommented.element);
     }
 
-    render(new PopupView(movies[0], comments), this.popupContainer, RenderPosition.AFTEREND);
+    render(new PopupView(movies[0], comments), this.#popupContainer, RenderPosition.AFTEREND);
 
   }
 }

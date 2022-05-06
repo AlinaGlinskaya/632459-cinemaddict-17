@@ -7,23 +7,25 @@ const createMoviesExtraTemplate = (heading) => (
 );
 
 export default class MoviesExtraView {
+  #heading;
+  #element = null;
   constructor(heading) {
-    this.heading = heading;
+    this.#heading = heading;
   }
 
-  getTemplate() {
-    return createMoviesExtraTemplate(this.heading);
+  get template() {
+    return createMoviesExtraTemplate(this.#heading);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

@@ -7,19 +7,20 @@ const createMoviesListTemplate = () => (
 );
 
 export default class MoviesListView {
-  getTemplate() {
-    return createMoviesListTemplate;
+  #element = null;
+  get template() {
+    return createMoviesListTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

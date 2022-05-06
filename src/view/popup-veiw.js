@@ -152,25 +152,29 @@ const createPopupTemplate = (movie, comments, formData = {}) => {
 };
 
 export default class PopupView {
+  #movie;
+  #comments;
+  #formData;
+  #element = null;
   constructor(movie, comments, formData) {
-    this.movie = movie;
-    this.comments = comments;
-    this.formData = formData;
+    this.#movie = movie;
+    this.#comments = comments;
+    this.#formData = formData;
   }
 
-  getTemplate() {
-    return createPopupTemplate(this.movie, this.comments, this.formData);
+  get template() {
+    return createPopupTemplate(this.#movie, this.#comments, this.#formData);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
