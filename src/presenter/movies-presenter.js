@@ -17,6 +17,8 @@ export default class MoviesPresenter {
   #moviesModel;
   #movies;
   #comments;
+
+
   constructor(popupContainer, moviesContainer, moviesModel, movies, comments) {
     this.#popupContainer = popupContainer;
     this.#moviesContainer = moviesContainer;
@@ -68,6 +70,12 @@ export default class MoviesPresenter {
     document.removeEventListener('keydown', handler);
   }
 
+  #onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      this.#closePopup(this.#onEscKeyDown);
+    }
+  };
+
   #openPopup(popup, handler) {
     render(popup, this.#popupContainer, RenderPosition.AFTEREND);
     body.classList.add('hide-overflow');
@@ -78,22 +86,15 @@ export default class MoviesPresenter {
     const movieCardComponent = new MovieCardView(movie);
     const popup = new PopupView(movie, comments);
 
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        this.#closePopup(onEscKeyDown);
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
     movieCardComponent.element.addEventListener('click', () => {
       if (document.body.querySelector('.film-details')) {
-        this.#closePopup(onEscKeyDown);
+        this.#closePopup(this.#onEscKeyDown);
       }
-      this.#openPopup(popup, onEscKeyDown);
+      this.#openPopup(popup, this.#onEscKeyDown);
     });
 
     popup.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
-      this.#closePopup(onEscKeyDown);
+      this.#closePopup(this.#onEscKeyDown);
     });
     render(movieCardComponent, container.element);
   }
