@@ -9,6 +9,8 @@ import {render} from '../render.js';
 import PopupView from '../view/popup-veiw';
 import {RenderPosition} from '../render.js';
 
+const body = document.querySelector('body');
+
 export default class MoviesPresenter {
   #popupContainer;
   #moviesContainer;
@@ -33,33 +35,65 @@ export default class MoviesPresenter {
   popupView = new PopupView();
 
   init() {
-    const movies = [...this.#movies];
-    const comments = [...this.#comments];
-
     render(new SortView(), this.#moviesContainer);
     render(this.moviesComponent, this.#moviesContainer);
     render(this.moviesList, this.moviesComponent.element);
     render(this.moviesListContainer, this.moviesList.element);
-
-    for (const movie of movies) {
-      render(new MovieCardView(movie), this.moviesListContainer.element);
-    }
-
     render(new ButtonShowMoreView(), this.moviesList.element);
-
     render(this.moviesExtraListRated, this.moviesComponent.element);
     render(this.moviesListContainerRated, this.moviesExtraListRated.element);
-    for (const movie of movies.slice(0,2)) {
-      render(new MovieCardView(movie), this.moviesListContainerRated.element);
-    }
-
     render(this.moviesExtraListCommented, this.moviesComponent.element);
     render(this.moviesListContainerCommented, this.moviesExtraListCommented.element);
-    for (const movie of movies.slice(3,5)) {
-      render(new MovieCardView(movie), this.moviesListContainerCommented.element);
+
+    const movies = [...this.#movies];
+    const comments = [...this.#comments];
+
+    for (const movie of movies) {
+      this.#renderMovie(movie, comments, this.moviesListContainer);
     }
 
-    render(new PopupView(movies[0], comments), this.#popupContainer, RenderPosition.AFTEREND);
+    for (const movie of movies.slice(0,2)) {
+      this.#renderMovie(movie, comments, this.moviesListContainerRated);
+    }
 
+    for (const movie of movies.slice(3,5)) {
+      this.#renderMovie(movie, comments, this.moviesListContainerCommented);
+    }
+
+  }
+
+  #renderMovie(movie, comments, container) {
+    const movieCardComponent = new MovieCardView(movie);
+    const popup = new PopupView(movie, comments);
+
+    const closePopup = () => {
+      body.querySelector('.film-details').remove();
+      body.classList.remove('hide-overflow');
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        closePopup();
+      }
+      document.removeEventListener('keydown', onEscKeyDown);
+    };
+
+    const openPopup = () => {
+      render(popup, this.#popupContainer, RenderPosition.AFTEREND);
+      body.classList.add('hide-overflow');
+      document.addEventListener('keydown', onEscKeyDown);
+    };
+
+    movieCardComponent.element.addEventListener('click', () => {
+      if (document.body.querySelector('.film-details')) {
+        closePopup();
+      }
+      openPopup();
+    });
+
+    popup.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
+      closePopup();
+    });
+    render(movieCardComponent, container.element);
   }
 }
