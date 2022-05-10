@@ -9,6 +9,7 @@ import {render} from '../render.js';
 import PopupView from '../view/popup-veiw';
 import {RenderPosition} from '../render.js';
 
+const MOVIES_COUNT_PER_STEP = 5;
 const body = document.querySelector('body');
 
 export default class MoviesPresenter {
@@ -27,42 +28,62 @@ export default class MoviesPresenter {
     this.#comments = comments;
   }
 
-  moviesComponent = new MoviesView();
-  moviesList = new MoviesList();
-  moviesListContainer = new MoviesListContainerView();
-  moviesExtraListRated = new MoviesExtraView('Top rated');
-  moviesExtraListCommented = new MoviesExtraView('Most commented');
-  moviesListContainerRated = new MoviesListContainerView();
-  moviesListContainerCommented = new MoviesListContainerView();
-  popupView = new PopupView();
+  #moviesComponent = new MoviesView();
+  #moviesList = new MoviesList();
+  #moviesListContainer = new MoviesListContainerView();
+  #moviesExtraListRated = new MoviesExtraView('Top rated');
+  #moviesExtraListCommented = new MoviesExtraView('Most commented');
+  #moviesListContainerRated = new MoviesListContainerView();
+  #moviesListContainerCommented = new MoviesListContainerView();
+  #buttonShowMoreComponent = new ButtonShowMoreView();
+  #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
   init() {
     render(new SortView(), this.#moviesContainer);
-    render(this.moviesComponent, this.#moviesContainer);
-    render(this.moviesList, this.moviesComponent.element);
-    render(this.moviesListContainer, this.moviesList.element);
-    render(new ButtonShowMoreView(), this.moviesList.element);
-    render(this.moviesExtraListRated, this.moviesComponent.element);
-    render(this.moviesListContainerRated, this.moviesExtraListRated.element);
-    render(this.moviesExtraListCommented, this.moviesComponent.element);
-    render(this.moviesListContainerCommented, this.moviesExtraListCommented.element);
+    render(this.#moviesComponent, this.#moviesContainer);
+    render(this.#moviesList, this.#moviesComponent.element);
+    render(this.#moviesListContainer, this.#moviesList.element);
+    render(this.#moviesExtraListRated, this.#moviesComponent.element);
+    render(this.#moviesListContainerRated, this.#moviesExtraListRated.element);
+    render(this.#moviesExtraListCommented, this.#moviesComponent.element);
+    render(this.#moviesListContainerCommented, this.#moviesExtraListCommented.element);
 
     const movies = [...this.#movies];
     const comments = [...this.#comments];
 
-    for (const movie of movies) {
-      this.#renderMovie(movie, comments, this.moviesListContainer);
+    if (movies.length > MOVIES_COUNT_PER_STEP) {
+      render(this.#buttonShowMoreComponent, this.#moviesList.element);
+
+      this.#buttonShowMoreComponent.element.addEventListener('click', this.#onClickShowMore);
+    }
+
+    for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
+      this.#renderMovie(movies[i], comments, this.#moviesListContainer);
     }
 
     for (const movie of movies.slice(0,2)) {
-      this.#renderMovie(movie, comments, this.moviesListContainerRated);
+      this.#renderMovie(movie, comments, this.#moviesListContainerRated);
     }
 
     for (const movie of movies.slice(3,5)) {
-      this.#renderMovie(movie, comments, this.moviesListContainerCommented);
+      this.#renderMovie(movie, comments, this.#moviesListContainerCommented);
     }
 
   }
+
+  #onClickShowMore = (evt) => {
+    evt.preventDefault();
+    this.#movies
+      .slice(this.#renderedMoviesCount, this.#renderedMoviesCount + MOVIES_COUNT_PER_STEP)
+      .forEach((movie) => this.#renderMovie(movie, this.#comments, this.#moviesListContainer));
+
+    this.#renderedMoviesCount += MOVIES_COUNT_PER_STEP;
+
+    if (this.#renderedMoviesCount >= this.#movies.length) {
+      this.#buttonShowMoreComponent.element.remove();
+      this.#buttonShowMoreComponent.removeElement();
+    }
+  };
 
   #closePopup(handler) {
     body.querySelector('.film-details').remove();

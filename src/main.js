@@ -11,7 +11,7 @@ const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 const siteFooterStatisticsElement = siteFooterElement.querySelector('.footer__statistics');
 const moviesModel = new MoviesModel();
-const movies = Array.from({length: 5}, generateMovie);
+const movies = Array.from({length: 27}, generateMovie);
 const comments = Array.from({length: 10}, generateComment);
 const moviesPresenter = new MoviesPresenter(siteFooterElement, siteMainElement, moviesModel, movies, comments);
 
