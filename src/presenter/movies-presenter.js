@@ -1,6 +1,6 @@
 import MoviesView from '../view/movies-view';
 import SortView from '../view/sort-view';
-import MoviesList from '../view/movies-list';
+import MoviesList from '../view/movies-list-view';
 import ButtonShowMoreView from '../view/button-show-more-view';
 import MoviesListContainerView from '../view/movies-list-container-view';
 import MovieCardView from '../view/movie-card-view';
@@ -8,6 +8,8 @@ import MoviesExtraView from '../view/movies-extra-view';
 import {render} from '../render.js';
 import PopupView from '../view/popup-veiw';
 import {RenderPosition} from '../render.js';
+import MoviesListTitleView from '../view/movies-list-title-view';
+import MoviesListEmptyView from '../view/movies-list-empty-view';
 
 const MOVIES_COUNT_PER_STEP = 5;
 const body = document.querySelector('body');
@@ -18,7 +20,6 @@ export default class MoviesPresenter {
   #moviesModel;
   #movies;
   #comments;
-
 
   constructor(popupContainer, moviesContainer, moviesModel, movies, comments) {
     this.#popupContainer = popupContainer;
@@ -39,17 +40,28 @@ export default class MoviesPresenter {
   #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
   init() {
+    const movies = [...this.#movies];
+    const comments = [...this.#comments];
+
+    this.#renderMain(movies, comments);
+  }
+
+  #renderMain (movies, comments) {
     render(new SortView(), this.#moviesContainer);
     render(this.#moviesComponent, this.#moviesContainer);
     render(this.#moviesList, this.#moviesComponent.element);
+
+    if (movies.length === 0) {
+      render(new MoviesListEmptyView, this.#moviesList.element);
+      return;
+    }
+
+    render(new MoviesListTitleView(), this.#moviesList.element);
     render(this.#moviesListContainer, this.#moviesList.element);
     render(this.#moviesExtraListRated, this.#moviesComponent.element);
     render(this.#moviesListContainerRated, this.#moviesExtraListRated.element);
     render(this.#moviesExtraListCommented, this.#moviesComponent.element);
     render(this.#moviesListContainerCommented, this.#moviesExtraListCommented.element);
-
-    const movies = [...this.#movies];
-    const comments = [...this.#comments];
 
     if (movies.length > MOVIES_COUNT_PER_STEP) {
       render(this.#buttonShowMoreComponent, this.#moviesList.element);
@@ -68,7 +80,6 @@ export default class MoviesPresenter {
     for (const movie of movies.slice(3,5)) {
       this.#renderMovie(movie, comments, this.#moviesListContainerCommented);
     }
-
   }
 
   #onClickShowMore = (evt) => {
