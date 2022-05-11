@@ -2,7 +2,7 @@ import UserRankView from './view/user-rank-view';
 import MainNavView from './view/main-nav-view';
 import MoviesPresenter from './presenter/movies-presenter';
 import MoviesStaticticsView from './view/movies-statistics-view';
-import {render} from './render.js';
+import {render} from './framework/render';
 import MoviesModel from './model/movies-model';
 import {generateMovie, generateComment} from './mock/movie';
 

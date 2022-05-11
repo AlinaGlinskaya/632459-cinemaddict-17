@@ -1,12 +1,13 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import {humanizeMovieReleaseDate, humanizeCommentDate, getTimeFromMins} from '../utils.js';
 import {EMOTIONS} from '../const.js';
 
-const createPopupTemplate = (movie, comments, formData = {}) => {
-  const {
-    smile = 'smile',
-    commentText = 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
-  } = formData;
+const FORM_DATA = {
+  smile: 'smile',
+  commentText: 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
+};
+
+const createPopupTemplate = (movie, comments, formData) => {
   const {title, alternativeTitle, description, totalRating, poster, runtime, ageRating, director} = movie.filmInfo;
   const {releaseCountry} = movie.filmInfo.release;
   const activeMovieDetailsControlsClassname = 'film-details__control-button--active';
@@ -57,7 +58,7 @@ const createPopupTemplate = (movie, comments, formData = {}) => {
       <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
     </label>`).join('');
 
-  const commentEmotionsTemplate = createCommentEmotionsTemplate(smile);
+  const commentEmotionsTemplate = createCommentEmotionsTemplate(formData.smile);
 
   return (`<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -138,7 +139,7 @@ const createPopupTemplate = (movie, comments, formData = {}) => {
             <div class="film-details__add-emoji-label"></div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value="${commentText}"></textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value="${formData.commentText}"></textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -151,12 +152,12 @@ const createPopupTemplate = (movie, comments, formData = {}) => {
   </section>`);
 };
 
-export default class PopupView {
-  #movie;
-  #comments;
-  #formData;
-  #element = null;
-  constructor(movie, comments, formData) {
+export default class PopupView extends AbstractView {
+  #movie = null;
+  #comments = null;
+  #formData = null;
+  constructor(movie, comments, formData = FORM_DATA) {
+    super();
     this.#movie = movie;
     this.#comments = comments;
     this.#formData = formData;
@@ -164,17 +165,5 @@ export default class PopupView {
 
   get template() {
     return createPopupTemplate(this.#movie, this.#comments, this.#formData);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

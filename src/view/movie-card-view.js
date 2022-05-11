@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import {humanizeMovieReleaseYearDate, getTimeFromMins} from '../utils.js';
 
 const createMovieCardTemplate = (movie) => {
@@ -36,26 +36,14 @@ const createMovieCardTemplate = (movie) => {
   </article>`);
 };
 
-export default class MovieCardView {
-  #element = null;
-  #movie;
+export default class MovieCardView extends AbstractView {
+  #movie = null;
   constructor(movie) {
+    super();
     this.#movie = movie;
   }
 
   get template() {
     return createMovieCardTemplate(this.#movie);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

@@ -5,7 +5,7 @@ import ButtonShowMoreView from '../view/button-show-more-view';
 import MoviesListContainerView from '../view/movies-list-container-view';
 import MovieCardView from '../view/movie-card-view';
 import MoviesExtraView from '../view/movies-extra-view';
-import {render} from '../render.js';
+import {render} from '../framework/render';
 import PopupView from '../view/popup-veiw';
 import {RenderPosition} from '../render.js';
 import MoviesListTitleView from '../view/movies-list-title-view';
