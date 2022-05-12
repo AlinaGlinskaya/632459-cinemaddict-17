@@ -156,14 +156,27 @@ export default class PopupView extends AbstractView {
   #movie = null;
   #comments = null;
   #formData = null;
+  #button = null;
   constructor(movie, comments, formData = FORM_DATA) {
     super();
     this.#movie = movie;
     this.#comments = comments;
     this.#formData = formData;
+    this.#button = '.film-details__close-btn';
   }
 
   get template() {
     return createPopupTemplate(this.#movie, this.#comments, this.#formData);
   }
+
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+
+    this.element.querySelector(this.#button).addEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

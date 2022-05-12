@@ -66,7 +66,7 @@ export default class MoviesPresenter {
     if (movies.length > MOVIES_COUNT_PER_STEP) {
       render(this.#buttonShowMoreComponent, this.#moviesList.element);
 
-      this.#buttonShowMoreComponent.element.addEventListener('click', this.#onClickShowMore);
+      this.#buttonShowMoreComponent.setClickHandler(this.#onClickShowMore);
     }
 
     for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
@@ -82,8 +82,7 @@ export default class MoviesPresenter {
     }
   }
 
-  #onClickShowMore = (evt) => {
-    evt.preventDefault();
+  #onClickShowMore = () => {
     this.#movies
       .slice(this.#renderedMoviesCount, this.#renderedMoviesCount + MOVIES_COUNT_PER_STEP)
       .forEach((movie) => this.#renderMovie(movie, this.#comments, this.#moviesListContainer));
@@ -114,20 +113,22 @@ export default class MoviesPresenter {
     document.addEventListener('keydown', handler);
   }
 
+  #onClickClosePopup = () => {
+    this.#closePopup(this.#onEscKeyDown);
+  };
+
   #renderMovie(movie, comments, container) {
     const movieCardComponent = new MovieCardView(movie);
     const popup = new PopupView(movie, comments);
 
-    movieCardComponent.element.addEventListener('click', () => {
+    movieCardComponent.setClickHandler(() => {
       if (document.body.querySelector('.film-details')) {
         this.#closePopup(this.#onEscKeyDown);
       }
       this.#openPopup(popup, this.#onEscKeyDown);
     });
 
-    popup.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
-      this.#closePopup(this.#onEscKeyDown);
-    });
+    popup.setClickHandler(this.#onClickClosePopup);
     render(movieCardComponent, container.element);
   }
 }
