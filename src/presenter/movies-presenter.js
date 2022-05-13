@@ -66,7 +66,7 @@ export default class MoviesPresenter {
     if (movies.length > MOVIES_COUNT_PER_STEP) {
       render(this.#buttonShowMoreComponent, this.#moviesList.element);
 
-      this.#buttonShowMoreComponent.setClickHandler(this.#onClickShowMore);
+      this.#buttonShowMoreComponent.setShowMoviesHandler(this.#onClickShowMore);
     }
 
     for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
@@ -121,14 +121,14 @@ export default class MoviesPresenter {
     const movieCardComponent = new MovieCardView(movie);
     const popup = new PopupView(movie, comments);
 
-    movieCardComponent.setClickHandler(() => {
+    movieCardComponent.setOpenPopupHandler(() => {
       if (document.body.querySelector('.film-details')) {
         this.#closePopup(this.#onEscKeyDown);
       }
       this.#openPopup(popup, this.#onEscKeyDown);
     });
 
-    popup.setClickHandler(this.#onClickClosePopup);
+    popup.setClosePopupHandler(this.#onClickClosePopup);
     render(movieCardComponent, container.element);
   }
 }
