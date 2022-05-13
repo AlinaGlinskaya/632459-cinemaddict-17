@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import {humanizeMovieReleaseDate, humanizeCommentDate, getTimeFromMins} from '../utils.js';
+import {humanizeMovieReleaseDate, humanizeCommentDate, getTimeFromMins} from '../utils/movie';
 import {EMOTIONS} from '../const.js';
 
 const FORM_DATA = {

@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import {humanizeMovieReleaseYearDate, getTimeFromMins} from '../utils.js';
+import {humanizeMovieReleaseYearDate, getTimeFromMins} from '../utils/movie';
 
 const createMovieCardTemplate = (movie) => {
   const {title, description, totalRating, poster, runtime, genre} = movie.filmInfo;
