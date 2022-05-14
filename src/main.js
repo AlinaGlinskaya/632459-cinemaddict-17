@@ -5,6 +5,7 @@ import MoviesStaticticsView from './view/movies-statistics-view';
 import {render} from './framework/render';
 import MoviesModel from './model/movies-model';
 import {generateMovie, generateComment} from './mock/movie';
+import {generateFilter} from './mock/filter';
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
@@ -13,10 +14,12 @@ const siteFooterStatisticsElement = siteFooterElement.querySelector('.footer__st
 const moviesModel = new MoviesModel();
 const movies = Array.from({length: 27}, generateMovie);
 const comments = Array.from({length: 10}, generateComment);
+const filters = generateFilter(movies);
 const moviesPresenter = new MoviesPresenter(siteFooterElement, siteMainElement, moviesModel, movies, comments);
 
 render(new UserRankView(), siteHeaderElement);
-render(new MainNavView(), siteMainElement);
+render(new MainNavView(filters), siteMainElement);
 render(new MoviesStaticticsView(), siteFooterStatisticsElement);
 
 moviesPresenter.init();
+
