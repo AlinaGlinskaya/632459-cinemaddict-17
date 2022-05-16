@@ -1,9 +1,10 @@
 import {FILTER_TYPES} from '../const';
 
 const filter = {
-  [FILTER_TYPES.WATCHLIST]: (movies) => movies.filter((movie) => movie.userDetails.watchlist),
-  [FILTER_TYPES.HISTORY]: (movies) => movies.filter((movie) => movie.userDetails.alreadyWatched),
-  [FILTER_TYPES.FAVORITE]: (movies) => movies.filter((movie) => movie.userDetails.favorite)
+  [FILTER_TYPES.ALL]: () => true,
+  [FILTER_TYPES.WATCHLIST]: (movie) => movie.userDetails.watchlist,
+  [FILTER_TYPES.HISTORY]: (movie) => movie.userDetails.alreadyWatched,
+  [FILTER_TYPES.FAVORITE]: (movie) => movie.userDetails.favorite
 };
 
 export {filter};

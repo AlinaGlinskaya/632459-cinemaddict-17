@@ -3,11 +3,10 @@ import {ucFirst} from '../utils/common';
 
 const createMainNavTemplate = (filters) => {
 
-  const createFiltersTemplate = () => filters.map((filter) => `<a href="#${filter.name}" class="main-navigation__item">${ucFirst(filter.name)} <span class="main-navigation__item-count">${filter.count}</span></a>`).join('');
+  const createFiltersTemplate = () => filters.map((filter) => `<a href="#${filter.name}" class="main-navigation__item ${filter.name === 'all movies' ? 'main-navigation__item--active' : ''}">${ucFirst(filter.name)} ${filter.name === 'all movies' ? '' : `<span class="main-navigation__item-count">${filter.count}</span>`} </a>`).join('');
 
   const filtersTemplate = createFiltersTemplate(filters);
   return `<nav class="main-navigation">
-    <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
     ${filtersTemplate}
   </nav>`;
 };
