@@ -14,7 +14,7 @@ import MoviesListEmptyView from '../view/movies-list-empty-view';
 const MOVIES_COUNT_PER_STEP = 5;
 const body = document.querySelector('body');
 
-export default class MoviesPresenter {
+export default class MainPresenter {
   #popupContainer;
   #moviesContainer;
   #moviesModel;
@@ -46,8 +46,11 @@ export default class MoviesPresenter {
     this.#renderMain(movies, comments);
   }
 
-  #renderMain (movies, comments) {
+  #renderSorting() {
     render(new SortView(), this.#moviesContainer);
+  }
+
+  #renderMainMoviesList(movies, comments) {
     render(this.#moviesComponent, this.#moviesContainer);
     render(this.#moviesList, this.#moviesComponent.element);
 
@@ -58,10 +61,6 @@ export default class MoviesPresenter {
 
     render(new MoviesListTitleView(), this.#moviesList.element);
     render(this.#moviesListContainer, this.#moviesList.element);
-    render(this.#moviesExtraListRated, this.#moviesComponent.element);
-    render(this.#moviesListContainerRated, this.#moviesExtraListRated.element);
-    render(this.#moviesExtraListCommented, this.#moviesComponent.element);
-    render(this.#moviesListContainerCommented, this.#moviesExtraListCommented.element);
 
     if (movies.length > MOVIES_COUNT_PER_STEP) {
       render(this.#buttonShowMoreComponent, this.#moviesList.element);
@@ -72,14 +71,29 @@ export default class MoviesPresenter {
     for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
       this.#renderMovie(movies[i], comments, this.#moviesListContainer);
     }
+  }
 
+  #renderRated(movies, comments) {
+    render(this.#moviesExtraListRated, this.#moviesComponent.element);
+    render(this.#moviesListContainerRated, this.#moviesExtraListRated.element);
     for (const movie of movies.slice(0,2)) {
       this.#renderMovie(movie, comments, this.#moviesListContainerRated);
     }
+  }
 
+  #renderCommented(movies, comments) {
+    render(this.#moviesExtraListCommented, this.#moviesComponent.element);
+    render(this.#moviesListContainerCommented, this.#moviesExtraListCommented.element);
     for (const movie of movies.slice(3,5)) {
       this.#renderMovie(movie, comments, this.#moviesListContainerCommented);
     }
+  }
+
+  #renderMain (movies, comments) {
+    this.#renderSorting();
+    this.#renderMainMoviesList(movies, comments);
+    this.#renderRated(movies, comments);
+    this.#renderCommented(movies, comments);
   }
 
   #onClickShowMore = () => {
