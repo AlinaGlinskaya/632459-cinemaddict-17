@@ -3,16 +3,14 @@ import SortView from '../view/sort-view';
 import MoviesList from '../view/movies-list-view';
 import ButtonShowMoreView from '../view/button-show-more-view';
 import MoviesListContainerView from '../view/movies-list-container-view';
-import MovieCardView from '../view/movie-card-view';
 import MoviesExtraView from '../view/movies-extra-view';
 import {render} from '../framework/render';
-import PopupView from '../view/popup-veiw';
-import {RenderPosition} from '../render.js';
 import MoviesListTitleView from '../view/movies-list-title-view';
 import MoviesListEmptyView from '../view/movies-list-empty-view';
+import MoviePresenter from './movie-presenter';
 
 const MOVIES_COUNT_PER_STEP = 5;
-const body = document.querySelector('body');
+
 
 export default class MainPresenter {
   #popupContainer;
@@ -48,6 +46,11 @@ export default class MainPresenter {
 
   #renderSorting() {
     render(new SortView(), this.#moviesContainer);
+  }
+
+  #renderMovie(movies, comments, container) {
+    const moviePresenter = new MoviePresenter(this.#popupContainer);
+    moviePresenter.init(movies, comments, container);
   }
 
   #renderMainMoviesList(movies, comments) {
@@ -108,41 +111,4 @@ export default class MainPresenter {
       this.#buttonShowMoreComponent.removeElement();
     }
   };
-
-  #closePopup(handler) {
-    body.querySelector('.film-details').remove();
-    body.classList.remove('hide-overflow');
-    document.removeEventListener('keydown', handler);
-  }
-
-  #onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      this.#closePopup(this.#onEscKeyDown);
-    }
-  };
-
-  #openPopup(popup, handler) {
-    render(popup, this.#popupContainer, RenderPosition.AFTEREND);
-    body.classList.add('hide-overflow');
-    document.addEventListener('keydown', handler);
-  }
-
-  #onClickClosePopup = () => {
-    this.#closePopup(this.#onEscKeyDown);
-  };
-
-  #renderMovie(movie, comments, container) {
-    const movieCardComponent = new MovieCardView(movie);
-    const popup = new PopupView(movie, comments);
-
-    movieCardComponent.setOpenPopupHandler(() => {
-      if (document.body.querySelector('.film-details')) {
-        this.#closePopup(this.#onEscKeyDown);
-      }
-      this.#openPopup(popup, this.#onEscKeyDown);
-    });
-
-    popup.setClosePopupHandler(this.#onClickClosePopup);
-    render(movieCardComponent, container.element);
-  }
 }
