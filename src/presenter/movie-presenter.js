@@ -1,34 +1,47 @@
 import MovieCardView from '../view/movie-card-view';
 import PopupView from '../view/popup-veiw';
-import {render} from '../framework/render';
+import {render, replace, remove} from '../framework/render';
 import {RenderPosition} from '../render.js';
 
 const body = document.querySelector('body');
 
 export default class MoviePresenter {
   #popupContainer = null;
-  #movies = null;
-  #comments = null;
+  #movieCardComponent = null;
+  #popupComponent = null;
 
-  constructor(popupContainer, movies, comments) {
+  constructor(popupContainer) {
     this.#popupContainer = popupContainer;
-    this.#movies = movies;
-    this.#comments = comments;
   }
 
   init(movie, comments, container) {
-    const movieCardComponent = new MovieCardView(movie);
-    const popup = new PopupView(movie, comments);
+    const prevMovieCardComponent = this.#movieCardComponent;
+    this.#movieCardComponent = new MovieCardView(movie);
 
-    movieCardComponent.setOpenPopupHandler(() => {
-      if (document.body.querySelector('.film-details')) {
-        this.#closePopup(this.#onEscKeyDown);
-      }
-      this.#openPopup(popup, this.#onEscKeyDown);
-    });
+    if (prevMovieCardComponent === null) {
+      render(this.#movieCardComponent, container.element);
+      this.#movieCardComponent.setOpenPopupHandler(() => {
+        this.#onMovieClick(movie, comments);
+      });
+      return;
+    }
 
-    popup.setClosePopupHandler(this.#onClickClosePopup);
-    render(movieCardComponent, container.element);
+    if (document.body.contains(prevMovieCardComponent.element)) {
+      replace(this.#movieCardComponent, prevMovieCardComponent);
+    }
+
+    remove(prevMovieCardComponent);
+  }
+
+  #onMovieClick(movie, comments) {
+    this.#popupComponent = new PopupView(movie, comments);
+
+    if (document.body.querySelector('.film-details')) {
+      this.#closePopup(this.#onEscKeyDown);
+    }
+
+    this.#openPopup(this.#popupComponent, this.#onEscKeyDown);
+    this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
   }
 
   #closePopup(handler) {
@@ -51,5 +64,10 @@ export default class MoviePresenter {
 
   #onClickClosePopup = () => {
     this.#closePopup(this.#onEscKeyDown);
+  };
+
+  destroy = () => {
+    remove(this.#movieCardComponent);
+    remove(this.#popupComponent);
   };
 }
