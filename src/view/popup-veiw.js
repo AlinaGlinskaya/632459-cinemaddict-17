@@ -26,7 +26,7 @@ const createPopupTemplate = (movie, comments, formData) => {
   const filmGenresTemplate = createMovieGenresTemplate(genresList);
 
   const createMovieDetailsControlsTemplate = (userDetails, activeClass) => (`<button type="button" class="film-details__control-button film-details__control-button--watchlist ${userDetails.watchlist ? activeClass  : ''}" id="watchlist" name="watchlist">Add to watchlist</button>
-  <button type="button" class="film-details__control-button film-details__control-button--active film-details__control-button--watched ${userDetails.alreadyWatched ? activeClass : ''}" id="watched" name="watched">Already watched</button>
+  <button type="button" class="film-details__control-button film-details__control-button--watched ${userDetails.alreadyWatched ? activeClass : ''}" id="watched" name="watched">Already watched</button>
   <button type="button" class="film-details__control-button film-details__control-button--favorite ${userDetails.favorite ? activeClass : ''}" id="favorite" name="favorite">Add to favorites</button>`);
 
   const filmDetailsControlsTemplate = createMovieDetailsControlsTemplate(movie.userDetails, activeMovieDetailsControlsClassname);
@@ -176,6 +176,36 @@ export default class PopupView extends AbstractView {
   };
 
   #closePopupHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
+
+  setAddToWatchlistHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#addToWatchlistHandler);
+  };
+
+  setAddToHistoryHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#addToHistoryHandler);
+  };
+
+  setAddToFavoriteHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#addToFavoriteHandler);
+  };
+
+  #addToWatchlistHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
+
+  #addToHistoryHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
+
+  #addToFavoriteHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
   };

@@ -1,5 +1,6 @@
 import {getRandomInteger} from '../utils/common';
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import {EMOTIONS} from '../const';
 
 const generateDescription = () => {
@@ -78,7 +79,7 @@ const generateDate = () => {
 };
 
 export const generateMovie = () => ({
-  id: '0',
+  id: nanoid(),
   comments: [
     '1', '2'
   ],

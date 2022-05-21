@@ -9,20 +9,29 @@ export default class MoviePresenter {
   #popupContainer = null;
   #movieCardComponent = null;
   #popupComponent = null;
+  #changeData = null;
+  #movie = null;
+  #userDetails = null;
 
-  constructor(popupContainer) {
+  constructor(popupContainer, changeData) {
     this.#popupContainer = popupContainer;
+    this.#changeData = changeData;
   }
 
   init(movie, comments, container) {
+    this.#movie = movie;
+    this.#userDetails = movie.userDetails;
     const prevMovieCardComponent = this.#movieCardComponent;
-    this.#movieCardComponent = new MovieCardView(movie);
+    this.#movieCardComponent = new MovieCardView(this.#movie);
 
     if (prevMovieCardComponent === null) {
       render(this.#movieCardComponent, container.element);
       this.#movieCardComponent.setOpenPopupHandler(() => {
-        this.#onMovieClick(movie, comments);
+        this.#onMovieClick(this.#movie, comments);
       });
+      this.#movieCardComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
+      this.#movieCardComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
+      this.#movieCardComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
       return;
     }
 
@@ -64,6 +73,18 @@ export default class MoviePresenter {
 
   #onClickClosePopup = () => {
     this.#closePopup(this.#onEscKeyDown);
+  };
+
+  #onClickAddToWatchlist = () => {
+    this.#changeData({...this.#movie, userDetails: {...this.#userDetails, watchlist: !this.#userDetails.watchlist}});
+  };
+
+  #onClickAddToWatched = () => {
+    this.#changeData({...this.#movie, userDetails: {...this.#userDetails, alreadyWatched: !this.#userDetails.alreadyWathced}});
+  };
+
+  #onClickAddToFavorite = () => {
+    this.#changeData({...this.#movie, userDetails: {...this.#userDetails, favorite: !this.#userDetails.favorite}});
   };
 
   destroy = () => {

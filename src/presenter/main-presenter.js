@@ -4,10 +4,11 @@ import MoviesList from '../view/movies-list-view';
 import ButtonShowMoreView from '../view/button-show-more-view';
 import MoviesListContainerView from '../view/movies-list-container-view';
 import MoviesExtraView from '../view/movies-extra-view';
-import {render} from '../framework/render';
+import {remove, render} from '../framework/render';
 import MoviesListTitleView from '../view/movies-list-title-view';
 import MoviesListEmptyView from '../view/movies-list-empty-view';
 import MoviePresenter from './movie-presenter';
+import {updateItem} from '../utils/common';
 
 const MOVIES_COUNT_PER_STEP = 5;
 
@@ -38,6 +39,7 @@ export default class MainPresenter {
   #sortComponent = new SortView();
   #moviesListEmptyComponent = new MoviesListEmptyView();
   #moviesListTitleComponent = new MoviesListTitleView();
+  #moviePresenter = new Map();
   #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
   init() {
@@ -52,8 +54,9 @@ export default class MainPresenter {
   }
 
   #renderMovie(movie, comments, container) {
-    const moviePresenter = new MoviePresenter(this.#popupContainer);
+    const moviePresenter = new MoviePresenter(this.#popupContainer, this.#onClickMovieUpdate);
     moviePresenter.init(movie, comments, container);
+    this.#moviePresenter.set(movie.id, moviePresenter);
   }
 
   #renderShowMoreButton() {
@@ -117,4 +120,16 @@ export default class MainPresenter {
       this.#buttonShowMoreComponent.removeElement();
     }
   };
+
+  #onClickMovieUpdate = (updatedMovie) => {
+    this.#movies = updateItem(this.#movies, updatedMovie);
+    this.#moviePresenter.get(updatedMovie.id).init(updatedMovie);
+  };
+
+  #clearMoviesList() {
+    this.#moviePresenter.forEach((presenter) => presenter.destroy());
+    this.#moviePresenter.clear();
+    this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;
+    remove(this.#buttonShowMoreComponent);
+  }
 }
