@@ -72,7 +72,6 @@ export default class MovieCardView extends AbstractView {
     this._callback.openPopupClick();
   };
 
-
   #addToWatchlistHandler = (evt) => {
     evt.preventDefault();
     evt.stopPropagation();

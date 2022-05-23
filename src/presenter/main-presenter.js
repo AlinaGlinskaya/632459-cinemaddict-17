@@ -12,7 +12,6 @@ import {updateItem} from '../utils/common';
 
 const MOVIES_COUNT_PER_STEP = 5;
 
-
 export default class MainPresenter {
   #popupContainer = null;
   #moviesContainer = null;
@@ -53,8 +52,14 @@ export default class MainPresenter {
     render(this.#sortComponent, this.#moviesContainer);
   }
 
+  #renderMovies = (from, to, comments, container) => {
+    this.#movies
+      .slice(from, to)
+      .forEach((movie) => this.#renderMovie(movie, comments, container));
+  };
+
   #renderMovie(movie, comments, container) {
-    const moviePresenter = new MoviePresenter(this.#popupContainer, this.#onClickMovieUpdate);
+    const moviePresenter = new MoviePresenter(this.#popupContainer, this.#onClickMovieUpdate, this.#onClickPopupReset);
     moviePresenter.init(movie, comments, container);
     this.#moviePresenter.set(movie.id, moviePresenter);
   }
@@ -79,33 +84,26 @@ export default class MainPresenter {
     if (movies.length > MOVIES_COUNT_PER_STEP) {
       this.#renderShowMoreButton();
     }
-
-    for (let i = 0; i < Math.min(movies.length, MOVIES_COUNT_PER_STEP); i++) {
-      this.#renderMovie(movies[i], comments, this.#moviesListContainerComponent);
-    }
+    this.#renderMovies(0, Math.min(movies.length, MOVIES_COUNT_PER_STEP), comments, this.#moviesListContainerComponent);
   }
 
-  #renderRated(movies, comments) {
+  #renderRated(comments) {
     render(this.#moviesExtraListRatedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerRatedComponent, this.#moviesExtraListRatedComponent.element);
-    for (const movie of movies.slice(0,2)) {
-      this.#renderMovie(movie, comments, this.#moviesListContainerRatedComponent);
-    }
+    this.#renderMovies(0, 2, comments, this.#moviesListContainerRatedComponent);
   }
 
-  #renderCommented(movies, comments) {
+  #renderCommented(comments) {
     render(this.#moviesExtraListCommentedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerCommentedComponent, this.#moviesExtraListCommentedComponent.element);
-    for (const movie of movies.slice(3,5)) {
-      this.#renderMovie(movie, comments, this.#moviesListContainerCommentedComponent);
-    }
+    this.#renderMovies(3, 5, comments, this.#moviesListContainerCommentedComponent);
   }
 
   #renderMain (movies, comments) {
     this.#renderSorting();
     this.#renderMainMoviesList(movies, comments);
-    this.#renderRated(movies, comments);
-    this.#renderCommented(movies, comments);
+    this.#renderRated(comments);
+    this.#renderCommented(comments);
   }
 
   #onClickShowMore = () => {
@@ -121,9 +119,13 @@ export default class MainPresenter {
     }
   };
 
-  #onClickMovieUpdate = (updatedMovie) => {
+  #onClickMovieUpdate = (updatedMovie, comments, container) => {
     this.#movies = updateItem(this.#movies, updatedMovie);
-    this.#moviePresenter.get(updatedMovie.id).init(updatedMovie);
+    this.#moviePresenter.get(updatedMovie.id).init(updatedMovie, comments, container);
+  };
+
+  #onClickPopupReset = () => {
+    this.#moviePresenter.forEach((presenter) => presenter.resetPopupView());
   };
 
   #clearMoviesList() {
