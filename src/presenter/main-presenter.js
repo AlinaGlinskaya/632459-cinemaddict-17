@@ -59,9 +59,11 @@ export default class MainPresenter {
   };
 
   #renderMovie(movie, comments, container) {
-    const moviePresenter = new MoviePresenter(this.#popupContainer, this.#onClickMovieUpdate, this.#onClickPopupReset);
-    moviePresenter.init(movie, comments, container);
-    this.#moviePresenter.set(movie.id, moviePresenter);
+    const moviePresenter = new MoviePresenter(container, this.#popupContainer, this.#onClickMovieUpdate, this.#onClickPopupReset);
+    moviePresenter.init(movie, comments);
+    const currentPresenters = this.#moviePresenter.get(movie.id) || [];
+    currentPresenters.push(moviePresenter);
+    this.#moviePresenter.set(movie.id, currentPresenters);
   }
 
   #renderShowMoreButton() {
@@ -99,7 +101,7 @@ export default class MainPresenter {
     this.#renderMovies(3, 5, comments, this.#moviesListContainerCommentedComponent);
   }
 
-  #renderMain (movies, comments) {
+  #renderMain(movies, comments) {
     this.#renderSorting();
     this.#renderMainMoviesList(movies, comments);
     this.#renderRated(comments);
@@ -119,17 +121,19 @@ export default class MainPresenter {
     }
   };
 
-  #onClickMovieUpdate = (updatedMovie, comments, container) => {
+  #onClickMovieUpdate = (updatedMovie, comments) => {
     this.#movies = updateItem(this.#movies, updatedMovie);
-    this.#moviePresenter.get(updatedMovie.id).init(updatedMovie, comments, container);
+    if (this.#moviePresenter.has(updatedMovie.id)) {
+      this.#moviePresenter.get(updatedMovie.id).forEach((presenter) => presenter.init(updatedMovie, comments));
+    }
   };
 
   #onClickPopupReset = () => {
-    this.#moviePresenter.forEach((presenter) => presenter.resetPopupView());
+    this.#moviePresenter.forEach((presenters) => presenters.forEach((presenter) => presenter.resetPopupView()));
   };
 
   #clearMoviesList() {
-    this.#moviePresenter.forEach((presenter) => presenter.destroy());
+    this.#moviePresenter.forEach((presenters) => presenters.forEach((presenter) => presenter.destroy()));
     this.#moviePresenter.clear();
     this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;
     remove(this.#buttonShowMoreComponent);

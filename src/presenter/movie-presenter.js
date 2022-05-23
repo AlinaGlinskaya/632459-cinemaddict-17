@@ -1,35 +1,30 @@
 import MovieCardView from '../view/movie-card-view';
-import PopupView from '../view/popup-veiw';
+import PopupView from '../view/popup-view';
 import {render, replace, remove} from '../framework/render';
 import {RenderPosition} from '../render.js';
 
 const body = document.querySelector('body');
-const PopupState = {
-  OPENED: 'OPENED:',
-  CLOSED: 'CLOSED'
-};
 
 export default class MoviePresenter {
+  #container = null;
   #popupContainer = null;
   #movieCardComponent = null;
   #popupComponent = null;
   #changeData = null;
   #movie = null;
   #comments = null;
-  #userDetails = null;
   #resetPopup = null;
-  #popupState = PopupState.CLOSED;
 
-  constructor(popupContainer, changeData, resetPopup) {
+  constructor(container, popupContainer, changeData, resetPopup) {
+    this.#container = container;
     this.#popupContainer = popupContainer;
     this.#changeData = changeData;
     this.#resetPopup = resetPopup;
   }
 
-  init(movie, comments, container) {
+  init(movie, comments) {
     this.#movie = movie;
     this.#comments = comments;
-    this.#userDetails = this.#movie.userDetails;
     const prevMovieCardComponent = this.#movieCardComponent;
 
     this.#movieCardComponent = new MovieCardView(movie);
@@ -43,33 +38,25 @@ export default class MoviePresenter {
     this.#movieCardComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
 
     if (prevMovieCardComponent === null) {
-      render(this.#movieCardComponent, container.element);
+      render(this.#movieCardComponent, this.#container.element);
       return;
     }
 
-    if (document.body.contains(prevMovieCardComponent.element)) {
+    if (this.#container.element.contains(prevMovieCardComponent.element)) {
       replace(this.#movieCardComponent, prevMovieCardComponent);
     }
     remove(prevMovieCardComponent);
   }
 
   #onMovieClick() {
-    if (this.#popupState === 'OPENED') {
-      this.#closePopup(this.#onEscKeyDown);
-    }
-    this.#openPopup(this.#onEscKeyDown);
-    this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
-    this.#resetPopup();
+    this.#openPopup();
   }
 
-  #closePopup(handler) {
-    if (this.#popupState === 'OPENED') {
-      this.#closePopup(this.#onEscKeyDown);
-    }
+  #closePopup() {
     remove(this.#popupComponent);
     body.classList.remove('hide-overflow');
-    document.removeEventListener('keydown', handler);
-    this.#popupState = PopupState.CLOSED;
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#popupComponent = null;
   }
 
   #onEscKeyDown = (evt) => {
@@ -78,12 +65,13 @@ export default class MoviePresenter {
     }
   };
 
-  #openPopup(handler) {
+  #openPopup() {
+    this.#resetPopup();
     this.#popupComponent = new PopupView(this.#movie, this.#comments);
+    this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
     render(this.#popupComponent, this.#popupContainer, RenderPosition.AFTEREND);
     body.classList.add('hide-overflow');
-    document.addEventListener('keydown', handler);
-    this.#popupState = PopupState.OPENED;
+    document.addEventListener('keydown', this.#onEscKeyDown);
   }
 
   #onClickClosePopup = () => {
@@ -91,21 +79,22 @@ export default class MoviePresenter {
   };
 
   resetPopupView = () => {
-    if (this.#popupState === PopupState.OPENED) {
-      this.#closePopup(this.#onEscKeyDown);
+    if (this.#popupComponent === null) {
+      return;
     }
+    this.#closePopup(this.#onEscKeyDown);
   };
 
   #onClickAddToWatchlist = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#userDetails, watchlist: !this.#userDetails.watchlist}});
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 
   #onClickAddToWatched = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#userDetails, alreadyWatched: !this.#userDetails.alreadyWathced}});
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
   };
 
   #onClickAddToFavorite = () => {
-    this.#changeData({...this.#movie, userDetails: {...this.#userDetails, favorite: !this.#userDetails.favorite}});
+    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
   destroy = () => {
