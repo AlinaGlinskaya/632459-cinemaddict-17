@@ -49,7 +49,7 @@ export default class MoviePresenter {
   }
 
   #onMovieClick() {
-    this.#openPopup();
+    this.openPopup();
   }
 
   #closePopup() {
@@ -65,13 +65,20 @@ export default class MoviePresenter {
     }
   };
 
-  #openPopup() {
+  openPopup() {
     this.#resetPopup();
+    const prevPopupComponent = this.#popupComponent;
     this.#popupComponent = new PopupView(this.#movie, this.#comments);
     this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
-    render(this.#popupComponent, this.#popupContainer, RenderPosition.AFTEREND);
+    this.#popupComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
+    this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
+    this.#popupComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
     body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onEscKeyDown);
+
+    if (prevPopupComponent === null) {
+      render(this.#popupComponent, this.#popupContainer, RenderPosition.AFTEREND);
+    }
   }
 
   #onClickClosePopup = () => {

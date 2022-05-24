@@ -121,10 +121,11 @@ export default class MainPresenter {
     }
   };
 
-  #onClickMovieUpdate = (updatedMovie, comments) => {
+  #onClickMovieUpdate = (updatedMovie) => {
     this.#movies = updateItem(this.#movies, updatedMovie);
     if (this.#moviePresenter.has(updatedMovie.id)) {
-      this.#moviePresenter.get(updatedMovie.id).forEach((presenter) => presenter.init(updatedMovie, comments));
+      this.#moviePresenter.get(updatedMovie.id).forEach((presenter) => presenter.init(updatedMovie, this.#comments));
+      this.#moviePresenter.get(updatedMovie.id).forEach((presenter) => presenter.openPopup(updatedMovie, this.#comments));
     }
   };
 

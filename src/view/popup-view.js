@@ -181,32 +181,32 @@ export default class PopupView extends AbstractView {
   };
 
   setAddToWatchlistHandler = (callback) => {
-    this._callback.click = callback;
+    this._callback.watchlistClick = callback;
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#addToWatchlistHandler);
   };
 
-  setAddToHistoryHandler = (callback) => {
-    this._callback.click = callback;
-    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#addToHistoryHandler);
+  setAddToWatchedHandler = (callback) => {
+    this._callback.watchedClick = callback;
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#addToWatchedHandler);
   };
 
   setAddToFavoriteHandler = (callback) => {
-    this._callback.click = callback;
+    this._callback.favoriteClick = callback;
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#addToFavoriteHandler);
   };
 
   #addToWatchlistHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.watchlistClick();
   };
 
-  #addToHistoryHandler = (evt) => {
+  #addToWatchedHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.watchedClick();
   };
 
   #addToFavoriteHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.favoriteClick();
   };
 }
