@@ -75,7 +75,11 @@ const generateDate = () => {
 
   const result = dayjs().add(daysGap, 'day');
   return dayjs(result).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+};
 
+const generateRating = (min, max) => {
+  const rating = min + Math.random() * (max - min);
+  return Math.floor(rating * 10) / 10;
 };
 
 export const generateMovie = () => ({
@@ -86,7 +90,7 @@ export const generateMovie = () => ({
   filmInfo: {
     title: generateTitle(),
     alternativeTitle: generateTitle(),
-    totalRating: 5.3,
+    totalRating: generateRating(1, 10),
     poster: generatePoster(),
     ageRating: 0,
     director: 'Tom Ford',

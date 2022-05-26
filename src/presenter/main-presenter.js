@@ -9,6 +9,8 @@ import MoviesListTitleView from '../view/movies-list-title-view';
 import MoviesListEmptyView from '../view/movies-list-empty-view';
 import MoviePresenter from './movie-presenter';
 import {updateItem} from '../utils/common';
+import {sortByDate, sortByRating} from '../utils/movie';
+import {SortType} from '../const';
 
 const MOVIES_COUNT_PER_STEP = 5;
 
@@ -39,17 +41,22 @@ export default class MainPresenter {
   #moviesListEmptyComponent = new MoviesListEmptyView();
   #moviesListTitleComponent = new MoviesListTitleView();
   #moviePresenter = new Map();
+  #unsortedMovies = [];
+  #currentSortType = SortType.DEFAULT;
   #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
   init() {
     const movies = [...this.#movies];
     const comments = [...this.#comments];
 
+    this.#unsortedMovies = [...this.#movies];
+
     this.#renderMain(movies, comments);
   }
 
   #renderSorting() {
     render(this.#sortComponent, this.#moviesContainer);
+    this.#sortComponent.setSortTypeChangeHandler(this.#onClickSortTypeChange);
   }
 
   #renderMovies = (from, to, comments, container) => {
@@ -74,12 +81,6 @@ export default class MainPresenter {
   #renderMainMoviesList(movies, comments) {
     render(this.#moviesComponent, this.#moviesContainer);
     render(this.#moviesListComponent, this.#moviesComponent.element);
-
-    if (movies.length === 0) {
-      render(this.#moviesListEmptyComponent, this.#moviesListComponent.element);
-      return;
-    }
-
     render(this.#moviesListTitleComponent, this.#moviesListComponent.element);
     render(this.#moviesListContainerComponent, this.#moviesListComponent.element);
 
@@ -102,6 +103,12 @@ export default class MainPresenter {
   }
 
   #renderMain(movies, comments) {
+    if (movies.length === 0) {
+      render(this.#moviesComponent, this.#moviesContainer);
+      render(this.#moviesListComponent, this.#moviesComponent.element);
+      render(this.#moviesListEmptyComponent, this.#moviesListComponent.element);
+      return;
+    }
     this.#renderSorting();
     this.#renderMainMoviesList(movies, comments);
     this.#renderRated(comments);
@@ -123,14 +130,39 @@ export default class MainPresenter {
 
   #onClickMovieUpdate = (updatedMovie) => {
     this.#movies = updateItem(this.#movies, updatedMovie);
+    this.#unsortedMovies = updateItem(this.#unsortedMovies, updatedMovie);
     if (this.#moviePresenter.has(updatedMovie.id)) {
       this.#moviePresenter.get(updatedMovie.id).forEach((presenter) => presenter.init(updatedMovie, this.#comments));
-      this.#moviePresenter.get(updatedMovie.id).forEach((presenter) => presenter.openPopup(updatedMovie, this.#comments));
     }
   };
 
   #onClickPopupReset = () => {
     this.#moviePresenter.forEach((presenters) => presenters.forEach((presenter) => presenter.resetPopupView()));
+  };
+
+  #sortMovies = (sortType) => {
+    switch (sortType) {
+      case SortType.DATE:
+        this.#movies.sort(sortByDate);
+        break;
+      case SortType.RATING:
+        this.#movies.sort(sortByRating);
+        break;
+      default:
+        this.#movies = [...this.#unsortedMovies];
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #onClickSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortMovies(sortType);
+    this.#clearMoviesList();
+    this.#renderMain(this.#movies, this.#comments);
   };
 
   #clearMoviesList() {

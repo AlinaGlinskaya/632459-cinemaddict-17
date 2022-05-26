@@ -46,10 +46,14 @@ export default class MoviePresenter {
       replace(this.#movieCardComponent, prevMovieCardComponent);
     }
     remove(prevMovieCardComponent);
+
+    if (this.#popupComponent) {
+      this.#openPopup();
+    }
   }
 
   #onMovieClick() {
-    this.openPopup();
+    this.#openPopup();
   }
 
   #closePopup() {
@@ -65,7 +69,7 @@ export default class MoviePresenter {
     }
   };
 
-  openPopup() {
+  #openPopup() {
     this.#resetPopup();
     const prevPopupComponent = this.#popupComponent;
     this.#popupComponent = new PopupView(this.#movie, this.#comments);

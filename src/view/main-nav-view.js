@@ -1,10 +1,10 @@
 import AbstractView from '../framework/view/abstract-view';
 import {ucFirst} from '../utils/common';
-import {FILTER_TYPES} from '../const';
+import {FilterType} from '../const';
 
 const createMainNavTemplate = (filters) => {
 
-  const createFiltersTemplate = () => filters.map((filter) => `<a href="#${filter.name}" class="main-navigation__item ${filter.name === FILTER_TYPES.ALL ? 'main-navigation__item--active' : ''}">${ucFirst(filter.name)} ${filter.name === 'all movies' ? '' : `<span class="main-navigation__item-count">${filter.count}</span>`} </a>`).join('');
+  const createFiltersTemplate = () => filters.map((filter) => `<a href="#${filter.name}" class="main-navigation__item ${filter.name === FilterType.ALL ? 'main-navigation__item--active' : ''}">${ucFirst(filter.name)} ${filter.name === 'all movies' ? '' : `<span class="main-navigation__item-count">${filter.count}</span>`} </a>`).join('');
 
   const filtersTemplate = createFiltersTemplate(filters);
   return `<nav class="main-navigation">
