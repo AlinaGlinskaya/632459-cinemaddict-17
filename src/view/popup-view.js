@@ -151,8 +151,7 @@ export default class PopupView extends AbstractStatefulView {
   #movie = null;
   #comments = null;
   #button = null;
-  #inputs = null;
-  #popup = null;
+  #form = null;
   constructor(movie, comments, formData = {emotion: 'smile'}) {
     super();
     this.#movie = movie;
@@ -170,7 +169,7 @@ export default class PopupView extends AbstractStatefulView {
     emotion: formData.emotion
   });
 
-  static parseStateTiForm = (state) => {
+  static parseStateToForm = (state) => {
     const formData = {...state};
 
     if (!formData.emotion) {
@@ -191,10 +190,8 @@ export default class PopupView extends AbstractStatefulView {
   };
 
   #setInputHandlers() {
-    this.#inputs = this.element.querySelectorAll('.film-details__emoji-item');
-    for (const input of this.#inputs) {
-      input.addEventListener('click', this.#changeCommentEmotionHandler);
-    }
+    this.#form = this.element.querySelector('.film-details__inner');
+    this.#form.addEventListener('change', this.#changeCommentEmotionHandler);
   }
 
   setClosePopupHandler = (callback) => {
@@ -240,12 +237,11 @@ export default class PopupView extends AbstractStatefulView {
 
   #changeCommentEmotionHandler = (evt) => {
     evt.preventDefault();
-    this._position = document.querySelector('.film-details').scrollTop;
+    this._position = this.element.scrollTop;
     this.updateElement({
       emotion: evt.target.value,
     });
 
-    this.#popup = document.querySelector('.film-details');
-    this.#popup.scrollTo(0, this._position);
+    this.element.scrollTo(0, this._position);
   };
 }
