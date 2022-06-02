@@ -97,15 +97,21 @@ export default class MoviePresenter {
   };
 
   #onClickAddToWatchlist = () => {
+    this._position = this.#popupComponent.element.scrollTop;
     this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+    this.#popupComponent.element.scrollTo(0, this._position);
   };
 
   #onClickAddToWatched = () => {
+    this._position = this.#popupComponent.element.scrollTop;
     this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
+    this.#popupComponent.element.scrollTo(0, this._position);
   };
 
   #onClickAddToFavorite = () => {
+    this._position = this.#popupComponent.element.scrollTop;
     this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
+    this.#popupComponent.element.scrollTo(0, this._position);
   };
 
   destroy = () => {
