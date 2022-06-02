@@ -2,6 +2,7 @@ import MovieCardView from '../view/movie-card-view';
 import PopupView from '../view/popup-view';
 import {render, replace, remove} from '../framework/render';
 import {RenderPosition} from '../render.js';
+import {UserAction, UpdateType} from '../const';
 
 const body = document.querySelector('body');
 
@@ -97,21 +98,36 @@ export default class MoviePresenter {
   };
 
   #onClickAddToWatchlist = () => {
-    this._position = this.#popupComponent.element.scrollTop;
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
-    this.#popupComponent.element.scrollTo(0, this._position);
+    this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+    if (this.#popupComponent) {
+      this.#popupComponent.element.scrollTo(0, this._position);
+    }
   };
 
   #onClickAddToWatched = () => {
-    this._position = this.#popupComponent.element.scrollTop;
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
-    this.#popupComponent.element.scrollTo(0, this._position);
+    this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
+    if (this.#popupComponent) {
+      this.#popupComponent.element.scrollTo(0, this._position);
+    }
   };
 
   #onClickAddToFavorite = () => {
-    this._position = this.#popupComponent.element.scrollTop;
-    this.#changeData({...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
-    this.#popupComponent.element.scrollTo(0, this._position);
+    this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
+    this.#changeData(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MINOR,
+      {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
+    if (this.#popupComponent) {
+      this.#popupComponent.element.scrollTo(0, this._position);
+    }
   };
 
   destroy = () => {
