@@ -26,9 +26,9 @@ const createPopupTemplate = (movie, comments, formData) => {
 
   const filmDetailsControlsTemplate = createMovieDetailsControlsTemplate(movie.userDetails, activeMovieDetailsControlsClassname);
 
-  const commentsAmount = comments.length;
-
   const movieComments = comments.filter((comment) => movie.comments.includes(comment.id));
+
+  const commentsAmount = movieComments.length;
 
   const createCommentsListTemplate = (commentsList) => commentsList.map(({author, comment, date, emotion}) =>
     `<li class="film-details__comment">

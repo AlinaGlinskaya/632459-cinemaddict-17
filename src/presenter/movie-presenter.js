@@ -101,7 +101,7 @@ export default class MoviePresenter {
     this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
     if (this.#popupComponent) {
       this.#popupComponent.element.scrollTo(0, this._position);
@@ -112,7 +112,7 @@ export default class MoviePresenter {
     this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
     if (this.#popupComponent) {
       this.#popupComponent.element.scrollTo(0, this._position);
@@ -123,7 +123,7 @@ export default class MoviePresenter {
     this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
     this.#changeData(
       UserAction.UPDATE_MOVIE,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
     if (this.#popupComponent) {
       this.#popupComponent.element.scrollTo(0, this._position);

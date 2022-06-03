@@ -33,8 +33,8 @@ export default class MainPresenter {
   #moviesExtraListCommentedComponent = new MoviesExtraView('Most commented');
   #moviesListContainerRatedComponent = new MoviesListContainerView();
   #moviesListContainerCommentedComponent = new MoviesListContainerView();
-  #buttonShowMoreComponent = new ButtonShowMoreView();
-  #sortComponent = new SortView();
+  #buttonShowMoreComponent = null;
+  #sortComponent = null;
   #moviesListEmptyComponent = new MoviesListEmptyView();
   #moviesListTitleComponent = new MoviesListTitleView();
   #moviePresenter = new Map();
@@ -62,8 +62,9 @@ export default class MainPresenter {
   }
 
   #renderSorting() {
-    render(this.#sortComponent, this.#moviesContainer);
+    this.#sortComponent = new SortView();
     this.#sortComponent.setSortTypeChangeHandler(this.#onClickSortTypeChange);
+    render(this.#sortComponent, this.#moviesContainer);
   }
 
   #renderMovies = (movies, comments, container) => {
@@ -79,49 +80,49 @@ export default class MainPresenter {
   }
 
   #renderShowMoreButton() {
+    this.#buttonShowMoreComponent = new ButtonShowMoreView();
     render(this.#buttonShowMoreComponent, this.#moviesListComponent.element);
     this.#buttonShowMoreComponent.setShowMoviesHandler(this.#onClickShowMore);
   }
 
-  #renderMainMoviesList(comments) {
-    const moviesCount = this.movies.length;
-    const movies = this.movies.slice(0, Math.min(moviesCount, MOVIES_COUNT_PER_STEP));
-    render(this.#moviesComponent, this.#moviesContainer);
-    render(this.#moviesListComponent, this.#moviesComponent.element);
-    render(this.#moviesListTitleComponent, this.#moviesListComponent.element);
-    render(this.#moviesListContainerComponent, this.#moviesListComponent.element);
-
-    if (moviesCount > MOVIES_COUNT_PER_STEP) {
-      this.#renderShowMoreButton();
-    }
-    this.#renderMovies(movies, comments, this.#moviesListContainerComponent);
-  }
-
-  #renderRated(comments) {
+  #renderRated() {
     const movies = this.movies.slice(0, 2);
     render(this.#moviesExtraListRatedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerRatedComponent, this.#moviesExtraListRatedComponent.element);
-    this.#renderMovies(movies, comments, this.#moviesListContainerRatedComponent);
+    this.#renderMovies(movies, this.comments, this.#moviesListContainerRatedComponent);
   }
 
-  #renderCommented(comments) {
+  #renderCommented() {
     const movies = this.movies.slice(3, 5);
     render(this.#moviesExtraListCommentedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerCommentedComponent, this.#moviesExtraListCommentedComponent.element);
-    this.#renderMovies(movies, comments, this.#moviesListContainerCommentedComponent);
+    this.#renderMovies(movies, this.comments, this.#moviesListContainerCommentedComponent);
   }
 
   #renderMain() {
-    if (this.movies.length === 0) {
+    const movies = this.movies;
+    const moviesCount = movies.length;
+
+    if (moviesCount === 0) {
       render(this.#moviesComponent, this.#moviesContainer);
       render(this.#moviesListComponent, this.#moviesComponent.element);
       render(this.#moviesListEmptyComponent, this.#moviesListComponent.element);
       return;
     }
+
     this.#renderSorting();
-    this.#renderMainMoviesList(this.comments);
-    this.#renderRated(this.comments);
-    this.#renderCommented(this.comments);
+    render(this.#moviesComponent, this.#moviesContainer);
+    render(this.#moviesListComponent, this.#moviesComponent.element);
+    render(this.#moviesListTitleComponent, this.#moviesListComponent.element);
+    render(this.#moviesListContainerComponent, this.#moviesListComponent.element);
+
+    if (moviesCount > this.#renderedMoviesCount) {
+      this.#renderShowMoreButton();
+    }
+
+    this.#renderMovies(movies.slice(0, Math.min(moviesCount, this.#renderedMoviesCount)), this.comments, this.#moviesListContainerComponent);
+    this.#renderRated();
+    this.#renderCommented();
   }
 
   #onClickShowMore = () => {
@@ -143,6 +144,14 @@ export default class MainPresenter {
         if (this.#moviePresenter.has(data.id)) {
           this.#moviePresenter.get(data.id).forEach((presenter) => presenter.init(data, this.comments));
         }
+        break;
+      case UpdateType.MINOR:
+        this.#clearMain();
+        this.#renderMain();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearMain({resetRenderedTaskCount: true, resetSortType: true});
+        this.#renderMain();
         break;
     }
   };
@@ -171,14 +180,26 @@ export default class MainPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#clearMoviesList();
+    this.#clearMain({resetRenderedMoviesCount: true});
     this.#renderMain();
   };
 
-  #clearMoviesList() {
+  #clearMain = ({resetRenderedMoviesCount = false, resetSortType = false} = {}) => {
+    const moviesCount = this.movies.length;
+
     this.#moviePresenter.forEach((presenters) => presenters.forEach((presenter) => presenter.destroy()));
     this.#moviePresenter.clear();
-    this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;
+    remove(this.#sortComponent);
     remove(this.#buttonShowMoreComponent);
-  }
+
+    if (resetRenderedMoviesCount) {
+      this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;
+    } else {
+      this.#renderedMoviesCount = Math.min(moviesCount, this.#renderedMoviesCount);
+    }
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
+  };
 }
