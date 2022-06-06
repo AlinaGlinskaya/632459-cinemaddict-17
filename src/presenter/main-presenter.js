@@ -10,7 +10,6 @@ import MoviesListEmptyView from '../view/movies-list-empty-view';
 import MoviePresenter from './movie-presenter';
 import {sortByDate, sortByRating} from '../utils/movie';
 import {SortType} from '../const';
-import MoviesModel from '../model/movies-model';
 import CommentsModel from '../model/comments-model';
 import {UserAction, UpdateType} from '../const';
 import {filter} from '../utils/filter';
@@ -21,11 +20,13 @@ export default class MainPresenter {
   #popupContainer = null;
   #moviesContainer = null;
   #filterModel = null;
+  #moviesModel = null;
 
-  constructor(popupContainer, moviesContainer, filterModel) {
+  constructor(popupContainer, moviesContainer, filterModel, moviesModel) {
     this.#popupContainer = popupContainer;
     this.#moviesContainer = moviesContainer;
     this.#filterModel = filterModel;
+    this.#moviesModel = moviesModel;
     this.#moviesModel.addObserver(this.#onModelEvent);
     this.#filterModel.addObserver(this.#onModelEvent);
   }
@@ -44,7 +45,6 @@ export default class MainPresenter {
   #moviePresenter = new Map();
   #currentSortType = SortType.DEFAULT;
   #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
-  #moviesModel = new MoviesModel();
   #commentsModel = new CommentsModel();
 
   get movies() {
@@ -163,7 +163,7 @@ export default class MainPresenter {
         this.#renderMain();
         break;
       case UpdateType.MAJOR:
-        this.#clearMain({resetRenderedTaskCount: true, resetSortType: true});
+        this.#clearMain({resetRenderedMoviesCount: true, resetSortType: true});
         this.#renderMain();
         break;
     }
