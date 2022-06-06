@@ -13,17 +13,21 @@ import {SortType} from '../const';
 import MoviesModel from '../model/movies-model';
 import CommentsModel from '../model/comments-model';
 import {UserAction, UpdateType} from '../const';
+import {filter} from '../utils/filter';
 
 const MOVIES_COUNT_PER_STEP = 5;
 
 export default class MainPresenter {
   #popupContainer = null;
   #moviesContainer = null;
+  #filterModel = null;
 
-  constructor(popupContainer, moviesContainer) {
+  constructor(popupContainer, moviesContainer, filterModel) {
     this.#popupContainer = popupContainer;
     this.#moviesContainer = moviesContainer;
+    this.#filterModel = filterModel;
     this.#moviesModel.addObserver(this.#onModelEvent);
+    this.#filterModel.addObserver(this.#onModelEvent);
   }
 
   #moviesComponent = new MoviesView();
@@ -44,13 +48,22 @@ export default class MainPresenter {
   #commentsModel = new CommentsModel();
 
   get movies() {
+    const filterType = this.#filterModel.filter;
+    const movies = this.#moviesModel.movies;
+    const filteredMovies = [];
+    for (const movie of movies) {
+      if(filter[filterType](movie)) {
+        filteredMovies.push(movie);
+      }
+    }
+
     switch (this.#currentSortType) {
       case SortType.DATE:
-        return [...this.#moviesModel.movies].sort(sortByDate);
+        return filteredMovies.sort(sortByDate);
       case SortType.RATING:
-        return [...this.#moviesModel.movies].sort(sortByRating);
+        return filteredMovies.sort(sortByRating);
     }
-    return this.#moviesModel.movies;
+    return filteredMovies;
   }
 
   get comments() {
@@ -62,7 +75,7 @@ export default class MainPresenter {
   }
 
   #renderSorting() {
-    this.#sortComponent = new SortView();
+    this.#sortComponent = new SortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#onClickSortTypeChange);
     render(this.#sortComponent, this.#moviesContainer);
   }

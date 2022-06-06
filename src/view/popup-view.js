@@ -30,7 +30,7 @@ const createPopupTemplate = (movie, comments, formData) => {
 
   const commentsAmount = movieComments.length;
 
-  const createCommentsListTemplate = (commentsList) => commentsList.map(({author, comment, date, emotion}) =>
+  const createCommentsListTemplate = (commentsList) => commentsList.map(({id, author, comment, date, emotion}) =>
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
@@ -40,7 +40,7 @@ const createPopupTemplate = (movie, comments, formData) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${humanizeCommentDate(date)}</span>
-          <button class="film-details__comment-delete">Delete</button>
+          <button class="film-details__comment-delete" data-id="${id}">Delete</button>
         </p>
       </div>
     </li>`).join('');
@@ -170,7 +170,7 @@ export default class PopupView extends AbstractStatefulView {
   });
 
   static parseStateToForm = (state) => {
-    const formData = {...state};
+    const formData = {...state.formData};
 
     if (!formData.emotion) {
       formData.emotion = 'smile';
@@ -187,6 +187,7 @@ export default class PopupView extends AbstractStatefulView {
     this.setAddToWatchlistHandler(this._callback.watchlistClick);
     this.setAddToWatchedHandler(this._callback.watchedClick);
     this.setAddToFavoriteHandler(this._callback.favoriteClick);
+    this.setDeleteCommentHandlers(this._callback.deleteClick);
   };
 
   #setInputHandlers() {
@@ -220,6 +221,14 @@ export default class PopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#addToFavoriteHandler);
   };
 
+  setDeleteCommentHandlers = (callback) => {
+    this._callback.deleteClick = callback;
+    const buttons = this.element.querySelectorAll('.film-details__comment-delete');
+    for (const button of buttons) {
+      button.addEventListener('click', this.#deleteCommentHandler);
+    }
+  };
+
   #addToWatchlistHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchlistClick();
@@ -233,6 +242,12 @@ export default class PopupView extends AbstractStatefulView {
   #addToFavoriteHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
+  };
+
+  #deleteCommentHandler = (evt) => {
+    evt.preventDefault();
+    const commentId = evt.target.dataset.id;
+    this._callback.deleteClick(commentId);
   };
 
   #changeCommentEmotionHandler = (evt) => {

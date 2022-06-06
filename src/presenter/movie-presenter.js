@@ -78,6 +78,7 @@ export default class MoviePresenter {
     this.#popupComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
     this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
     this.#popupComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
+    this.#popupComponent.setDeleteCommentHandlers(this.#onClickDeleteComment);
     body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onEscKeyDown);
 
@@ -128,6 +129,14 @@ export default class MoviePresenter {
     if (this.#popupComponent) {
       this.#popupComponent.element.scrollTo(0, this._position);
     }
+  };
+
+  #onClickDeleteComment = (comment) => {
+    this.#changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.MINOR,
+      comment
+    );
   };
 
   destroy = () => {

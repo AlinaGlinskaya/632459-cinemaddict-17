@@ -85,7 +85,7 @@ const generateRating = (min, max) => {
 export const generateMovie = () => ({
   id: nanoid(),
   comments: [
-    '1', '2'
+    '1', '2', '3', '4', '5', '6', '7', '8'
   ],
   filmInfo: {
     title: generateTitle(),
@@ -115,7 +115,7 @@ export const generateMovie = () => ({
     description: generateDescription(),
   },
   userDetails: {
-    watchlist: Boolean(getRandomInteger(0, 1)),
+    watchlist: Boolean(getRandomInteger(0, 8)),
     alreadyWatched: Boolean(getRandomInteger(0, 1)),
     watchingDate: '2019-04-12T16:12:32.554Z',
     favorite: Boolean(getRandomInteger(0, 1))
@@ -124,7 +124,7 @@ export const generateMovie = () => ({
 
 export const generateComment = () => (
   {
-    id: '2',
+    id: String(getRandomInteger(1, 10)),
     author: 'Ilya O\'Reilly',
     comment: generateCommentText(),
     date: generateDate(),

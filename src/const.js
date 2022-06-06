@@ -1,7 +1,7 @@
 const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 
 const FilterType = {
-  ALL: 'all movies',
+  ALL: 'All movies',
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITE: 'favorite'
