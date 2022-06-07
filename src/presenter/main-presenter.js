@@ -153,7 +153,7 @@ export default class MainPresenter {
     switch (updateType) {
       case UpdateType.PATCH:
         if (this.#moviePresenter.has(data.id)) {
-          this.#moviePresenter.get(data.id).forEach((presenter) => presenter.init(data, this.comments));
+          this.#moviePresenter.get(data.id).forEach((presenter) => presenter.init(data));
         }
         break;
       case UpdateType.MINOR:

@@ -84,6 +84,7 @@ export default class MoviePresenter {
     this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
     this.#popupComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
     this.#popupComponent.setDeleteCommentHandlers(this.#onClickDeleteComment);
+    this.#popupComponent.setAddCommentHandler(this.#onKeyDownAddComment);
     body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onEscKeyDown);
 
@@ -114,28 +115,35 @@ export default class MoviePresenter {
   #onClickAddToWatchlist = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 
   #onClickAddToWatched = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
   };
 
   #onClickAddToFavorite = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.MAJOR,
+      UpdateType.PATCH,
       {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
   #onClickDeleteComment = (comment) => {
     this.#changeData(
       UserAction.DELETE_COMMENT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
+      comment);
+  };
+
+  #onKeyDownAddComment = (comment) => {
+    this.#changeData(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
       comment);
   };
 

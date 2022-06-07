@@ -172,8 +172,7 @@ export default class PopupView extends AbstractStatefulView {
   }
 
   static parseFormToState = (formData) => ({...formData,
-    emotion: formData.emotion,
-    comments: this.comments
+    emotion: formData.emotion
   });
 
   static parseStateToForm = (state) => {
@@ -188,10 +187,6 @@ export default class PopupView extends AbstractStatefulView {
     return formData;
   };
 
-  #setComments = () => {
-    PopupView.parseStateToForm(this._state);
-  };
-
   _restoreHandlers = () => {
     this.#setInputHandlers();
     this.setClosePopupHandler(this._callback.closeClick);
@@ -199,6 +194,7 @@ export default class PopupView extends AbstractStatefulView {
     this.setAddToWatchedHandler(this._callback.watchedClick);
     this.setAddToFavoriteHandler(this._callback.favoriteClick);
     this.setDeleteCommentHandlers(this._callback.deleteClick);
+    this.setAddCommentHandler(this._callback.addKeydown);
   };
 
   #setInputHandlers() {
@@ -239,6 +235,11 @@ export default class PopupView extends AbstractStatefulView {
     }
   };
 
+  setAddCommentHandler = (callback) => {
+    this._callback.addKeydown = callback;
+    this.#form.addEventListener('keydown', this.#addNewCommentHandler);
+  };
+
   #addToWatchlistHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchlistClick();
@@ -254,24 +255,38 @@ export default class PopupView extends AbstractStatefulView {
     this._callback.favoriteClick();
   };
 
+  #customUpdateElement = (data) => {
+    this._position = this.element.scrollTop;
+    this.updateElement(data);
+    this.element.scrollTo(0, this._position);
+  };
+
   #deleteCommentHandler = (evt) => {
     evt.preventDefault();
     const commentId = evt.target.dataset.id;
     this._callback.deleteClick(commentId);
-    this._position = this.element.scrollTop;
-    this.updateElement(
-      {comments: this.comments}
-    );
+    this.#customUpdateElement({comments: this.comments});
     PopupView.parseStateToForm(this._state);
-    this.element.scrollTo(0, this._position);
   };
 
   #changeCommentEmotionHandler = (evt) => {
     evt.preventDefault();
-    this._position = this.element.scrollTop;
-    this.updateElement({
-      emotion: evt.target.value,
-    });
-    this.element.scrollTo(0, this._position);
+    if (evt.target.nodeName === 'INPUT') {
+      this.#customUpdateElement({emotion: evt.target.value});
+    }
+  };
+
+  #addNewCommentHandler = (evt) => {
+    if (evt.ctrlKey && evt.keyCode === 13) {
+      const comment = {
+        id: '1',
+        author: 'Author',
+        comment: evt.target.value,
+        emotion: this._state.emotion
+      };
+      this._callback.addKeydown(comment);
+      this.#customUpdateElement({comments: this.comments});
+      PopupView.parseStateToForm(this._state);
+    }
   };
 }
