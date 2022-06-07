@@ -10,7 +10,6 @@ import MoviesListEmptyView from '../view/movies-list-empty-view';
 import MoviePresenter from './movie-presenter';
 import {sortByDate, sortByRating} from '../utils/movie';
 import {SortType} from '../const';
-import CommentsModel from '../model/comments-model';
 import {UserAction, UpdateType} from '../const';
 import {filter} from '../utils/filter';
 
@@ -21,12 +20,15 @@ export default class MainPresenter {
   #moviesContainer = null;
   #filterModel = null;
   #moviesModel = null;
+  #commentsModel = null;
 
-  constructor(popupContainer, moviesContainer, filterModel, moviesModel) {
+  constructor(popupContainer, moviesContainer, filterModel, moviesModel, commentsModel) {
     this.#popupContainer = popupContainer;
     this.#moviesContainer = moviesContainer;
     this.#filterModel = filterModel;
     this.#moviesModel = moviesModel;
+    this.#commentsModel = commentsModel;
+
     this.#moviesModel.addObserver(this.#onModelEvent);
     this.#filterModel.addObserver(this.#onModelEvent);
   }
@@ -45,7 +47,7 @@ export default class MainPresenter {
   #moviePresenter = new Map();
   #currentSortType = SortType.DEFAULT;
   #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
-  #commentsModel = new CommentsModel();
+
 
   get movies() {
     const filterType = this.#filterModel.filter;
@@ -66,10 +68,6 @@ export default class MainPresenter {
     return filteredMovies;
   }
 
-  get comments() {
-    return this.#commentsModel.comments;
-  }
-
   init() {
     this.#renderMain();
   }
@@ -80,13 +78,13 @@ export default class MainPresenter {
     render(this.#sortComponent, this.#moviesContainer);
   }
 
-  #renderMovies = (movies, comments, container) => {
-    movies.forEach((movie) => this.#renderMovie(movie, comments, container));
+  #renderMovies = (movies, container) => {
+    movies.forEach((movie) => this.#renderMovie(movie, container));
   };
 
-  #renderMovie(movie, comments, container) {
-    const moviePresenter = new MoviePresenter(container, this.#popupContainer, this.#onViewAction, this.#onClickPopupReset);
-    moviePresenter.init(movie, comments);
+  #renderMovie(movie, container) {
+    const moviePresenter = new MoviePresenter(container, this.#popupContainer, this.#onViewAction, this.#onClickPopupReset, this.#commentsModel);
+    moviePresenter.init(movie);
     const currentPresenters = this.#moviePresenter.get(movie.id) || [];
     currentPresenters.push(moviePresenter);
     this.#moviePresenter.set(movie.id, currentPresenters);
@@ -102,14 +100,14 @@ export default class MainPresenter {
     const movies = this.movies.slice(0, 2);
     render(this.#moviesExtraListRatedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerRatedComponent, this.#moviesExtraListRatedComponent.element);
-    this.#renderMovies(movies, this.comments, this.#moviesListContainerRatedComponent);
+    this.#renderMovies(movies, this.#moviesListContainerRatedComponent);
   }
 
   #renderCommented() {
     const movies = this.movies.slice(3, 5);
     render(this.#moviesExtraListCommentedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerCommentedComponent, this.#moviesExtraListCommentedComponent.element);
-    this.#renderMovies(movies, this.comments, this.#moviesListContainerCommentedComponent);
+    this.#renderMovies(movies, this.#moviesListContainerCommentedComponent);
   }
 
   #renderMain() {
@@ -133,7 +131,7 @@ export default class MainPresenter {
       this.#renderShowMoreButton();
     }
 
-    this.#renderMovies(movies.slice(0, Math.min(moviesCount, this.#renderedMoviesCount)), this.comments, this.#moviesListContainerComponent);
+    this.#renderMovies(movies.slice(0, Math.min(moviesCount, this.#renderedMoviesCount)), this.#moviesListContainerComponent);
     this.#renderRated();
     this.#renderCommented();
   }
@@ -142,7 +140,7 @@ export default class MainPresenter {
     const moviesCount = this.movies.length;
     const newRenderedMoviesCount = Math.min(moviesCount, this.#renderedMoviesCount + MOVIES_COUNT_PER_STEP);
     const movies = this.movies.slice(this.#renderedMoviesCount, newRenderedMoviesCount);
-    this.#renderMovies(movies, this.comments, this.#moviesListContainerComponent);
+    this.#renderMovies(movies, this.#moviesListContainerComponent);
 
     this.#renderedMoviesCount = newRenderedMoviesCount;
 

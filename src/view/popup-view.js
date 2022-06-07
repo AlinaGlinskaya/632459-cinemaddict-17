@@ -149,24 +149,31 @@ const createPopupTemplate = (movie, comments, formData) => {
 
 export default class PopupView extends AbstractStatefulView {
   #movie = null;
-  #comments = null;
   #button = null;
   #form = null;
-  constructor(movie, comments, formData = {emotion: 'smile'}) {
+  #comments = null;
+  #commentsModel = null;
+  constructor(movie, comments, commentsModel, formData = {emotion: 'smile'}) {
     super();
     this.#movie = movie;
     this.#comments = comments;
     this.#button = '.film-details__close-btn';
+    this.#commentsModel = commentsModel;
     this._state = PopupView.parseFormToState(formData);
     this.#setInputHandlers();
   }
 
+  get comments() {
+    return this.#commentsModel.comments;
+  }
+
   get template() {
-    return createPopupTemplate(this.#movie, this.#comments, this._state);
+    return createPopupTemplate(this.#movie, this.comments, this._state);
   }
 
   static parseFormToState = (formData) => ({...formData,
-    emotion: formData.emotion
+    emotion: formData.emotion,
+    comments: this.comments
   });
 
   static parseStateToForm = (state) => {
@@ -179,6 +186,10 @@ export default class PopupView extends AbstractStatefulView {
     delete formData.emotion;
 
     return formData;
+  };
+
+  #setComments = () => {
+    PopupView.parseStateToForm(this._state);
   };
 
   _restoreHandlers = () => {
@@ -197,7 +208,6 @@ export default class PopupView extends AbstractStatefulView {
 
   setClosePopupHandler = (callback) => {
     this._callback.closeClick = callback;
-
     this.element.querySelector(this.#button).addEventListener('click', this.#closePopupHandler);
   };
 
@@ -248,6 +258,12 @@ export default class PopupView extends AbstractStatefulView {
     evt.preventDefault();
     const commentId = evt.target.dataset.id;
     this._callback.deleteClick(commentId);
+    this._position = this.element.scrollTop;
+    this.updateElement(
+      {comments: this.comments}
+    );
+    PopupView.parseStateToForm(this._state);
+    this.element.scrollTo(0, this._position);
   };
 
   #changeCommentEmotionHandler = (evt) => {
@@ -256,7 +272,6 @@ export default class PopupView extends AbstractStatefulView {
     this.updateElement({
       emotion: evt.target.value,
     });
-
     this.element.scrollTo(0, this._position);
   };
 }

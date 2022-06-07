@@ -1,11 +1,12 @@
 import AbstractView from '../framework/view/abstract-view';
 import {humanizeMovieReleaseYearDate, getTimeFromMins} from '../utils/movie';
 
-const createMovieCardTemplate = (movie) => {
+const createMovieCardTemplate = (movie, comments) => {
   const {title, description, totalRating, poster, runtime, genre} = movie.filmInfo;
   const {date} = movie.filmInfo.release;
 
-  const commentsAmount = movie.comments.length;
+  const movieComments = comments.filter((comment) => movie.comments.includes(comment.id));
+  const commentsAmount = movieComments.length;
   const releaseDate = humanizeMovieReleaseYearDate(date);
   const filmDuration = getTimeFromMins(runtime);
   const activeMovieControlsClassname = 'film-card__controls-item--active';
@@ -38,13 +39,15 @@ const createMovieCardTemplate = (movie) => {
 
 export default class MovieCardView extends AbstractView {
   #movie = null;
-  constructor(movie) {
+  #comments = null;
+  constructor(movie, comments) {
     super();
     this.#movie = movie;
+    this.#comments = comments;
   }
 
   get template() {
-    return createMovieCardTemplate(this.#movie);
+    return createMovieCardTemplate(this.#movie, this.#comments);
   }
 
   setOpenPopupHandler = (callback) => {

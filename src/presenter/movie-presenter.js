@@ -13,22 +13,27 @@ export default class MoviePresenter {
   #popupComponent = null;
   #changeData = null;
   #movie = null;
-  #comments = null;
   #resetPopup = null;
+  #commentsModel = null;
 
-  constructor(container, popupContainer, changeData, resetPopup) {
+  constructor(container, popupContainer, changeData, resetPopup, commentsModel) {
     this.#container = container;
     this.#popupContainer = popupContainer;
     this.#changeData = changeData;
     this.#resetPopup = resetPopup;
+    this.#commentsModel = commentsModel;
+    this.#commentsModel.addObserver(this.#changeData);
   }
 
-  init(movie, comments) {
+  get comments() {
+    return this.#commentsModel.comments;
+  }
+
+  init(movie) {
     this.#movie = movie;
-    this.#comments = comments;
     const prevMovieCardComponent = this.#movieCardComponent;
 
-    this.#movieCardComponent = new MovieCardView(movie);
+    this.#movieCardComponent = new MovieCardView(movie, this.comments);
 
     this.#movieCardComponent.setOpenPopupHandler(() => {
       this.#onMovieClick();
@@ -73,7 +78,7 @@ export default class MoviePresenter {
   #openPopup() {
     this.#resetPopup();
     const prevPopupComponent = this.#popupComponent;
-    this.#popupComponent = new PopupView(this.#movie, this.#comments);
+    this.#popupComponent = new PopupView(this.#movie, this.comments, this.#commentsModel);
     this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
     this.#popupComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
     this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
@@ -98,45 +103,40 @@ export default class MoviePresenter {
     this.#closePopup(this.#onEscKeyDown);
   };
 
-  #onClickAddToWatchlist = () => {
+  #customUpdateElement(userAction, updateType, data) {
     this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
-    this.#changeData(
-      UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
-      {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
+    this.#changeData(userAction, updateType, data);
     if (this.#popupComponent) {
       this.#popupComponent.element.scrollTo(0, this._position);
     }
+  }
+
+  #onClickAddToWatchlist = () => {
+    this.#customUpdateElement(
+      UserAction.UPDATE_MOVIE,
+      UpdateType.MAJOR,
+      {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 
   #onClickAddToWatched = () => {
-    this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
-    this.#changeData(
+    this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MAJOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
-    if (this.#popupComponent) {
-      this.#popupComponent.element.scrollTo(0, this._position);
-    }
   };
 
   #onClickAddToFavorite = () => {
-    this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
-    this.#changeData(
+    this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MAJOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
-    if (this.#popupComponent) {
-      this.#popupComponent.element.scrollTo(0, this._position);
-    }
   };
 
   #onClickDeleteComment = (comment) => {
     this.#changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.MINOR,
-      comment
-    );
+      comment);
   };
 
   destroy = () => {
