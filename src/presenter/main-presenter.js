@@ -9,8 +9,7 @@ import MoviesListTitleView from '../view/movies-list-title-view';
 import MoviesListEmptyView from '../view/movies-list-empty-view';
 import MoviePresenter from './movie-presenter';
 import {sortByDate, sortByRating} from '../utils/movie';
-import {SortType} from '../const';
-import {UserAction, UpdateType} from '../const';
+import {SortType, UserAction, UpdateType, FilterType} from '../const';
 import {filter} from '../utils/filter';
 
 const MOVIES_COUNT_PER_STEP = 5;
@@ -42,19 +41,20 @@ export default class MainPresenter {
   #moviesListContainerCommentedComponent = new MoviesListContainerView();
   #buttonShowMoreComponent = null;
   #sortComponent = null;
-  #moviesListEmptyComponent = new MoviesListEmptyView();
+  #moviesListEmptyComponent = null;
   #moviesListTitleComponent = new MoviesListTitleView();
   #moviePresenter = new Map();
   #currentSortType = SortType.DEFAULT;
+  #filterType = FilterType.ALL;
   #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
 
 
   get movies() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const movies = this.#moviesModel.movies;
     const filteredMovies = [];
     for (const movie of movies) {
-      if(filter[filterType](movie)) {
+      if(filter[this.#filterType](movie)) {
         filteredMovies.push(movie);
       }
     }
@@ -115,6 +115,7 @@ export default class MainPresenter {
     const moviesCount = movies.length;
 
     if (moviesCount === 0) {
+      this.#moviesListEmptyComponent = new MoviesListEmptyView(this.#filterType);
       render(this.#moviesComponent, this.#moviesContainer);
       render(this.#moviesListComponent, this.#moviesComponent.element);
       render(this.#moviesListEmptyComponent, this.#moviesListComponent.element);
@@ -149,6 +150,11 @@ export default class MainPresenter {
     }
   };
 
+  #updatePopup(data) {
+    const presenter = this.#moviePresenter.get(data.id)[0];
+    presenter.openPopup(data);
+  }
+
   #onModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
@@ -159,6 +165,7 @@ export default class MainPresenter {
       case UpdateType.MINOR:
         this.#clearMain();
         this.#renderMain();
+        //this.#updatePopup(data);
         break;
       case UpdateType.MAJOR:
         this.#clearMain({resetRenderedMoviesCount: true, resetSortType: true});
@@ -167,16 +174,17 @@ export default class MainPresenter {
     }
   };
 
-  #onViewAction = (actionType, updateType, update) => {
+  #onViewAction = (actionType, updateType, updateMovie, updateComment) => {
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
-        this.#moviesModel.updateMovie(updateType, update);
+        this.#moviesModel.updateMovie(updateType, updateMovie);
         break;
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(updateType, update);
+        this.#commentsModel.addComment(updateType, updateMovie, updateComment);
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, update);
+        this.#commentsModel.deleteComment(updateType, updateMovie, updateComment);
+        this.#moviesModel.updateMovie(updateType, updateMovie);
         break;
     }
   };
@@ -202,6 +210,11 @@ export default class MainPresenter {
     this.#moviePresenter.clear();
     remove(this.#sortComponent);
     remove(this.#buttonShowMoreComponent);
+    remove(this.#moviesComponent, this.#moviesContainer);
+
+    if (this.#moviesListEmptyComponent) {
+      remove(this.#moviesListEmptyComponent);
+    }
 
     if (resetRenderedMoviesCount) {
       this.#renderedMoviesCount = MOVIES_COUNT_PER_STEP;

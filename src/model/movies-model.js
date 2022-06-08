@@ -13,8 +13,8 @@ export default class MoviesModel extends Observable {
     return this.#movies;
   }
 
-  updateMovie = (updateType, update) => {
-    const index = this.#movies.findIndex((movie) => movie.id === update.id);
+  updateMovie = (updateType, updateMovie) => {
+    const index = this.#movies.findIndex((movie) => movie.id === updateMovie.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting movie');
@@ -22,10 +22,11 @@ export default class MoviesModel extends Observable {
 
     this.#movies = [
       ...this.#movies.slice(0, index),
-      update,
+      updateMovie,
       ...this.#movies.slice(index + 1),
     ];
 
-    this._notify(updateType, update);
+    this._notify(updateType, updateMovie);
   };
+
 }

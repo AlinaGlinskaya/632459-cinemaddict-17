@@ -264,7 +264,7 @@ export default class PopupView extends AbstractStatefulView {
   #deleteCommentHandler = (evt) => {
     evt.preventDefault();
     const commentId = evt.target.dataset.id;
-    this._callback.deleteClick(commentId);
+    this._callback.deleteClick(this.#movie, commentId);
     this.#customUpdateElement({comments: this.comments});
     PopupView.parseStateToForm(this._state);
   };
@@ -279,8 +279,9 @@ export default class PopupView extends AbstractStatefulView {
   #addNewCommentHandler = (evt) => {
     if (evt.ctrlKey && evt.keyCode === 13) {
       const comment = {
-        id: '1',
+        id: '2',
         author: 'Author',
+        date: new Date(),
         comment: evt.target.value,
         emotion: this._state.emotion
       };

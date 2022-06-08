@@ -54,12 +54,12 @@ export default class MoviePresenter {
     remove(prevMovieCardComponent);
 
     if (this.#popupComponent) {
-      this.#openPopup();
+      this.openPopup(this.#movie);
     }
   }
 
   #onMovieClick() {
-    this.#openPopup();
+    this.openPopup(this.#movie);
   }
 
   #closePopup() {
@@ -75,10 +75,10 @@ export default class MoviePresenter {
     }
   };
 
-  #openPopup() {
+  openPopup(movie) {
     this.#resetPopup();
     const prevPopupComponent = this.#popupComponent;
-    this.#popupComponent = new PopupView(this.#movie, this.comments, this.#commentsModel);
+    this.#popupComponent = new PopupView(movie, this.comments, this.#commentsModel);
     this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
     this.#popupComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
     this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
@@ -104,9 +104,9 @@ export default class MoviePresenter {
     this.#closePopup(this.#onEscKeyDown);
   };
 
-  #customUpdateElement(userAction, updateType, data) {
+  #customUpdateElement(userAction, updateType, movie, comment) {
     this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
-    this.#changeData(userAction, updateType, data);
+    this.#changeData(userAction, updateType, movie, comment);
     if (this.#popupComponent) {
       this.#popupComponent.element.scrollTo(0, this._position);
     }
@@ -115,36 +115,36 @@ export default class MoviePresenter {
   #onClickAddToWatchlist = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 
   #onClickAddToWatched = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
   };
 
   #onClickAddToFavorite = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
-  #onClickDeleteComment = (comment) => {
-    this.#changeData(
+  #onClickDeleteComment = (movie, comment) => {
+    this.#customUpdateElement(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
-      comment);
+      movie, comment);
   };
 
-  #onKeyDownAddComment = (comment) => {
-    this.#changeData(
+  #onKeyDownAddComment = (movie, comment) => {
+    this.#customUpdateElement(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
-      comment);
+      movie, comment);
   };
 
   destroy = () => {
