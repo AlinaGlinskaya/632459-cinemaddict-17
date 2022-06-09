@@ -1,7 +1,6 @@
 import MovieCardView from '../view/movie-card-view';
 import PopupView from '../view/popup-view';
-import {render, replace, remove} from '../framework/render';
-import {RenderPosition} from '../render.js';
+import {render, replace, remove, RenderPosition} from '../framework/render';
 import {UserAction, UpdateType} from '../const';
 
 const body = document.querySelector('body');
@@ -50,16 +49,18 @@ export default class MoviePresenter {
 
     if (this.#container.element.contains(prevMovieCardComponent.element)) {
       replace(this.#movieCardComponent, prevMovieCardComponent);
+    } else {
+      render(this.#movieCardComponent, this.#container.element);
     }
     remove(prevMovieCardComponent);
 
     if (this.#popupComponent) {
-      this.openPopup(this.#movie);
+      this.openPopup();
     }
   }
 
   #onMovieClick() {
-    this.openPopup(this.#movie);
+    this.openPopup();
   }
 
   #closePopup() {
@@ -75,10 +76,15 @@ export default class MoviePresenter {
     }
   };
 
-  openPopup(movie) {
+  isOpenPopup() {
+    return !!this.#popupComponent;
+  }
+
+  openPopup(data = this.#movie) {
+    this.#movie = data;
     this.#resetPopup();
     const prevPopupComponent = this.#popupComponent;
-    this.#popupComponent = new PopupView(movie, this.comments, this.#commentsModel);
+    this.#popupComponent = new PopupView(this.#movie, this.comments, this.#commentsModel);
     this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
     this.#popupComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
     this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
@@ -105,9 +111,12 @@ export default class MoviePresenter {
   };
 
   #customUpdateElement(userAction, updateType, movie, comment) {
+    const state = this.#popupComponent ? this.#popupComponent._state : null;
     this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
     this.#changeData(userAction, updateType, movie, comment);
     if (this.#popupComponent) {
+      this.#popupComponent._setState(state);
+      this.#popupComponent.updateElement({state});
       this.#popupComponent.element.scrollTo(0, this._position);
     }
   }
@@ -136,14 +145,14 @@ export default class MoviePresenter {
   #onClickDeleteComment = (movie, comment) => {
     this.#customUpdateElement(
       UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       movie, comment);
   };
 
   #onKeyDownAddComment = (movie, comment) => {
     this.#customUpdateElement(
       UserAction.ADD_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       movie, comment);
   };
 

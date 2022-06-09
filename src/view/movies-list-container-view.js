@@ -6,4 +6,8 @@ export default class MoviesListContainerView extends AbstractView {
   get template() {
     return createMoviesListContainerTemplate();
   }
+
+  clear() {
+    this.element.innerHTML = '';
+  }
 }

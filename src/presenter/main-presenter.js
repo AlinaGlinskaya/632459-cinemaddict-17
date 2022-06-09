@@ -4,7 +4,7 @@ import MoviesList from '../view/movies-list-view';
 import ButtonShowMoreView from '../view/button-show-more-view';
 import MoviesListContainerView from '../view/movies-list-container-view';
 import MoviesExtraView from '../view/movies-extra-view';
-import {remove, render} from '../framework/render';
+import {remove, render, RenderPosition} from '../framework/render';
 import MoviesListTitleView from '../view/movies-list-title-view';
 import MoviesListEmptyView from '../view/movies-list-empty-view';
 import MoviePresenter from './movie-presenter';
@@ -44,6 +44,9 @@ export default class MainPresenter {
   #moviesListEmptyComponent = null;
   #moviesListTitleComponent = new MoviesListTitleView();
   #moviePresenter = new Map();
+  #moviePresenterRated = new Map();
+  #moviePresenterCommented = new Map();
+  #moviePresenters = [this.#moviePresenter, this.#moviePresenterRated, this.#moviePresenterCommented];
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
@@ -78,16 +81,19 @@ export default class MainPresenter {
     render(this.#sortComponent, this.#moviesContainer);
   }
 
-  #renderMovies = (movies, container) => {
-    movies.forEach((movie) => this.#renderMovie(movie, container));
+  #renderMovies = (movies, container, mapPresenters) => {
+    movies.forEach((movie) => this.#renderMovie(movie, container, mapPresenters));
   };
 
-  #renderMovie(movie, container) {
+  #renderMovie(movie, container, mapPresenters) {
+    if (mapPresenters.has(movie.id)) {
+      mapPresenters.get(movie.id).init(movie);
+      return;
+    }
+
     const moviePresenter = new MoviePresenter(container, this.#popupContainer, this.#onViewAction, this.#onClickPopupReset, this.#commentsModel);
     moviePresenter.init(movie);
-    const currentPresenters = this.#moviePresenter.get(movie.id) || [];
-    currentPresenters.push(moviePresenter);
-    this.#moviePresenter.set(movie.id, currentPresenters);
+    mapPresenters.set(movie.id, moviePresenter);
   }
 
   #renderShowMoreButton() {
@@ -100,14 +106,14 @@ export default class MainPresenter {
     const movies = this.movies.slice(0, 2);
     render(this.#moviesExtraListRatedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerRatedComponent, this.#moviesExtraListRatedComponent.element);
-    this.#renderMovies(movies, this.#moviesListContainerRatedComponent);
+    this.#renderMovies(movies, this.#moviesListContainerRatedComponent, this.#moviePresenterRated);
   }
 
   #renderCommented() {
     const movies = this.movies.slice(3, 5);
     render(this.#moviesExtraListCommentedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerCommentedComponent, this.#moviesExtraListCommentedComponent.element);
-    this.#renderMovies(movies, this.#moviesListContainerCommentedComponent);
+    this.#renderMovies(movies, this.#moviesListContainerCommentedComponent, this.#moviePresenterCommented);
   }
 
   #renderMain() {
@@ -124,7 +130,7 @@ export default class MainPresenter {
 
     this.#renderSorting();
     render(this.#moviesComponent, this.#moviesContainer);
-    render(this.#moviesListComponent, this.#moviesComponent.element);
+    render(this.#moviesListComponent, this.#moviesComponent.element, RenderPosition.AFTERBEGIN);
     render(this.#moviesListTitleComponent, this.#moviesListComponent.element);
     render(this.#moviesListContainerComponent, this.#moviesListComponent.element);
 
@@ -132,7 +138,7 @@ export default class MainPresenter {
       this.#renderShowMoreButton();
     }
 
-    this.#renderMovies(movies.slice(0, Math.min(moviesCount, this.#renderedMoviesCount)), this.#moviesListContainerComponent);
+    this.#renderMovies(movies.slice(0, Math.min(moviesCount, this.#renderedMoviesCount)), this.#moviesListContainerComponent, this.#moviePresenter);
     this.#renderRated();
     this.#renderCommented();
   }
@@ -141,7 +147,7 @@ export default class MainPresenter {
     const moviesCount = this.movies.length;
     const newRenderedMoviesCount = Math.min(moviesCount, this.#renderedMoviesCount + MOVIES_COUNT_PER_STEP);
     const movies = this.movies.slice(this.#renderedMoviesCount, newRenderedMoviesCount);
-    this.#renderMovies(movies, this.#moviesListContainerComponent);
+    this.#renderMovies(movies, this.#moviesListContainerComponent, this.#moviePresenter);
 
     this.#renderedMoviesCount = newRenderedMoviesCount;
 
@@ -151,8 +157,12 @@ export default class MainPresenter {
   };
 
   #updatePopup(data) {
-    const presenter = this.#moviePresenter.get(data.id)[0];
-    presenter.openPopup(data);
+    this.#moviePresenters.forEach((presenters) => {
+      const moviePresenter = presenters.get(data.id);
+      if (moviePresenter && moviePresenter.isOpenPopup()) {
+        moviePresenter.openPopup(data);
+      }
+    });
   }
 
   #onModelEvent = (updateType, data) => {
@@ -163,9 +173,9 @@ export default class MainPresenter {
         }
         break;
       case UpdateType.MINOR:
-        this.#clearMain();
+        this.#clearMain({resetPresenters: false});
         this.#renderMain();
-        //this.#updatePopup(data);
+        this.#updatePopup(data);
         break;
       case UpdateType.MAJOR:
         this.#clearMain({resetRenderedMoviesCount: true, resetSortType: true});
@@ -190,7 +200,9 @@ export default class MainPresenter {
   };
 
   #onClickPopupReset = () => {
-    this.#moviePresenter.forEach((presenters) => presenters.forEach((presenter) => presenter.resetPopupView()));
+    this.#moviePresenters
+      .forEach((map) => [...map.values()]
+        .forEach((presenter) => presenter.resetPopupView()));
   };
 
   #onClickSortTypeChange = (sortType) => {
@@ -203,14 +215,23 @@ export default class MainPresenter {
     this.#renderMain();
   };
 
-  #clearMain = ({resetRenderedMoviesCount = false, resetSortType = false} = {}) => {
+  #clearMain = ({resetPresenters = true, resetRenderedMoviesCount = false, resetSortType = false} = {}) => {
     const moviesCount = this.movies.length;
 
-    this.#moviePresenter.forEach((presenters) => presenters.forEach((presenter) => presenter.destroy()));
-    this.#moviePresenter.clear();
+    if (resetPresenters) {
+      this.#moviePresenters
+        .forEach((map) => {
+          [...map.values()].forEach((presenter) => presenter.destroy());
+          map.clear();
+        });
+    }
+
     remove(this.#sortComponent);
     remove(this.#buttonShowMoreComponent);
-    remove(this.#moviesComponent, this.#moviesContainer);
+
+    this.#moviesListContainerComponent.clear();
+    this.#moviesListContainerRatedComponent.clear();
+    this.#moviesListContainerCommentedComponent.clear();
 
     if (this.#moviesListEmptyComponent) {
       remove(this.#moviesListEmptyComponent);
