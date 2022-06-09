@@ -1,6 +1,7 @@
 import AbstractStatefulView  from '../framework/view/abstract-stateful-view';
 import {humanizeMovieReleaseDate, humanizeCommentDate, getTimeFromMins} from '../utils/movie';
 import {EMOTIONS} from '../const.js';
+import he from 'he';
 
 const createPopupTemplate = (movie, comments, formData) => {
   const {title, alternativeTitle, description, totalRating, poster, runtime, ageRating, director} = movie.filmInfo;
@@ -275,7 +276,7 @@ export default class PopupView extends AbstractStatefulView {
         id: '2',
         author: 'Author',
         date: new Date(),
-        comment: evt.target.value,
+        comment: he.encode(evt.target.value),
         emotion: this._state.emotion
       };
       this._callback.addKeydown(comment);
