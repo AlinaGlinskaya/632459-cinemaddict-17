@@ -168,9 +168,12 @@ export default class MainPresenter {
   #onModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        if (this.#moviePresenter.has(data.id)) {
-          this.#moviePresenter.get(data.id).forEach((presenter) => presenter.init(data));
-        }
+        this.#moviePresenters.forEach((presenters) => {
+          const moviePresenter = presenters.get(data.id);
+          if (moviePresenter) {
+            moviePresenter.init(data);
+          }
+        });
         break;
       case UpdateType.MINOR:
         this.#clearMain({resetPresenters: false});
@@ -191,6 +194,7 @@ export default class MainPresenter {
         break;
       case UserAction.ADD_COMMENT:
         this.#commentsModel.addComment(updateType, updateMovie, updateComment);
+        this.#moviesModel.updateMovie(updateType, updateMovie);
         break;
       case UserAction.DELETE_COMMENT:
         this.#commentsModel.deleteComment(updateType, updateMovie, updateComment);

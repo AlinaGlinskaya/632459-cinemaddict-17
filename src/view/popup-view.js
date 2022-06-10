@@ -135,7 +135,7 @@ const createPopupTemplate = (movie, comments, formData) => {
             <div class="film-details__add-emoji-label"><img src="images/emoji/${formData.emotion}.png" width="55" height="55" alt="emoji-${formData.emotion}"></div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${formData.comment}</textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(formData.comment)}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -276,10 +276,10 @@ export default class PopupView extends AbstractStatefulView {
         id: '2',
         author: 'Author',
         date: new Date(),
-        comment: he.encode(evt.target.value),
+        comment: evt.target.value,
         emotion: this._state.emotion
       };
-      this._callback.addKeydown(comment);
+      this._callback.addKeydown(this.#movie, comment);
       this.#customUpdateElement({...defaultState, comments: this.comments});
     }
   };
