@@ -253,7 +253,6 @@ export default class PopupView extends AbstractStatefulView {
     evt.preventDefault();
     const commentId = evt.target.dataset.id;
     this._callback.deleteClick(this.#movie, commentId);
-    this.#customUpdateElement({comments: this.comments});
   };
 
   #changeCommentHandler = (evt) => {
@@ -264,7 +263,7 @@ export default class PopupView extends AbstractStatefulView {
       emotion: formData.get('comment-emoji')
     };
     if (commentData.emotion === this._state.emotion) {
-      this._setState(commentData);
+      this._state = commentData;
     } else {
       this.#customUpdateElement(commentData);
     }
@@ -280,7 +279,6 @@ export default class PopupView extends AbstractStatefulView {
         emotion: this._state.emotion
       };
       this._callback.addKeydown(this.#movie, comment);
-      this.#customUpdateElement({...defaultState, comments: this.comments});
     }
   };
 }

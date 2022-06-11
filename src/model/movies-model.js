@@ -3,10 +3,17 @@ import {generateMovie} from '../mock/movie';
 
 export default class MoviesModel extends Observable {
   #movies;
+  #moviesApiService = null;
 
-  constructor() {
+
+  constructor(moviesApiService) {
     super();
+    this.#moviesApiService = moviesApiService;
     this.#movies = Array.from({length: 27}, generateMovie);
+
+    this.#moviesApiService.movies.then((movies) => {
+      console.log(movies.map(this.#adaptToClient));
+    });
   }
 
   get movies() {
@@ -28,5 +35,37 @@ export default class MoviesModel extends Observable {
 
     this._notify(updateType, updateMovie);
   };
+
+  #adaptToClient(movie) {
+    const adaptedMovie = {
+      id: movie.id,
+      comments: movie.comments,
+      filmInfo: {
+        title: movie.film_info.title,
+        alternativeTitle: movie.film_info.alternative_title,
+        totalRating: movie.film_info.total_rating,
+        poster: movie.film_info.poster,
+        ageRating: movie.film_info.age_rating,
+        director: movie.film_info.director,
+        writers: movie.film_info.writers,
+        actors: movie.film_info.actors,
+        release: {
+          date: movie.film_info.release.date,
+          releaseCountry: movie.film_info.release.release_country
+        },
+        runtime: movie.film_info.runtime,
+        genre: movie.film_info.genre,
+        description: movie.film_info.description
+      },
+      userDetails: {
+        watchlist: movie.user_details.wathclist,
+        alreadyWatched: movie.user_details.already_watched,
+        watchingDate: movie.user_details.watching_date,
+        favorite: movie.user_details.favorite
+      }
+    };
+
+    return adaptedMovie;
+  }
 
 }

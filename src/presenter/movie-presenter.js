@@ -124,35 +124,35 @@ export default class MoviePresenter {
   #onClickAddToWatchlist = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 
   #onClickAddToWatched = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
   };
 
   #onClickAddToFavorite = () => {
     this.#customUpdateElement(
       UserAction.UPDATE_MOVIE,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
   #onClickDeleteComment = (movie, comment) => {
     this.#customUpdateElement(
       UserAction.DELETE_COMMENT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       movie, comment);
   };
 
   #onKeyDownAddComment = (movie, comment) => {
     this.#customUpdateElement(
       UserAction.ADD_COMMENT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       movie, comment);
   };
 
