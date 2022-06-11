@@ -27,4 +27,5 @@ render(new MoviesStaticticsView(), siteFooterStatisticsElement);
 
 filterPresenter.init();
 mainPresenter.init();
+moviesModel.init();
 

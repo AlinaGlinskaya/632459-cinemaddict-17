@@ -11,6 +11,7 @@ import MoviePresenter from './movie-presenter';
 import {sortByDate, sortByRating} from '../utils/movie';
 import {SortType, UserAction, UpdateType, FilterType} from '../const';
 import {filter} from '../utils/filter';
+import LoadingMoviesView from '../view/loading-movies-view';
 
 const MOVIES_COUNT_PER_STEP = 5;
 
@@ -43,6 +44,7 @@ export default class MainPresenter {
   #sortComponent = null;
   #moviesListEmptyComponent = null;
   #moviesListTitleComponent = new MoviesListTitleView();
+  #loadingMoviesComponent = new LoadingMoviesView();
   #moviePresenter = new Map();
   #moviePresenterRated = new Map();
   #moviePresenterCommented = new Map();
@@ -50,6 +52,7 @@ export default class MainPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #renderedMoviesCount = MOVIES_COUNT_PER_STEP;
+  #isLoading = true;
 
 
   get movies() {
@@ -79,6 +82,12 @@ export default class MainPresenter {
     this.#sortComponent = new SortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#onClickSortTypeChange);
     render(this.#sortComponent, this.#moviesContainer);
+  }
+
+  #renderLoading() {
+    render(this.#moviesComponent, this.#moviesContainer);
+    render(this.#moviesListComponent, this.#moviesComponent.element);
+    render(this.#loadingMoviesComponent, this.#moviesListComponent.element);
   }
 
   #renderMovies = (movies, container, mapPresenters) => {
@@ -119,6 +128,11 @@ export default class MainPresenter {
   #renderMain() {
     const movies = this.movies;
     const moviesCount = movies.length;
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if (moviesCount === 0) {
       this.#moviesListEmptyComponent = new MoviesListEmptyView(this.#filterType);
@@ -184,6 +198,11 @@ export default class MainPresenter {
         this.#clearMain({resetRenderedMoviesCount: true, resetSortType: true});
         this.#renderMain();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingMoviesComponent);
+        this.#renderMain();
+        break;
     }
   };
 
@@ -232,6 +251,9 @@ export default class MainPresenter {
 
     remove(this.#sortComponent);
     remove(this.#buttonShowMoreComponent);
+    remove(this.#loadingMoviesComponent);
+    remove(this.#moviesExtraListCommentedComponent);
+    remove(this.#moviesExtraListRatedComponent);
 
     this.#moviesListContainerComponent.clear();
     this.#moviesListContainerRatedComponent.clear();
