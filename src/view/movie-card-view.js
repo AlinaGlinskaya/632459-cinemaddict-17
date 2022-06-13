@@ -4,9 +4,7 @@ import {humanizeMovieReleaseYearDate, getTimeFromMins} from '../utils/movie';
 const createMovieCardTemplate = (movie, comments) => {
   const {title, description, totalRating, poster, runtime, genre} = movie.filmInfo;
   const {date} = movie.filmInfo.release;
-
-  const movieComments = comments.filter((comment) => movie.comments.includes(comment.id));
-  const commentsAmount = movieComments.length;
+  const commentsAmount = comments.length;
   const releaseDate = humanizeMovieReleaseYearDate(date);
   const filmDuration = getTimeFromMins(runtime);
   const activeMovieControlsClassname = 'film-card__controls-item--active';

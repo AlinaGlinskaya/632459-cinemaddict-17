@@ -24,15 +24,16 @@ export default class MoviePresenter {
     this.#commentsModel.addObserver(this.#changeData);
   }
 
-  get comments() {
-    return this.#commentsModel.comments;
-  }
+  getComments = async () => {
+    const comments =  await this.#commentsModel.init(this.#movie.id).then(() => this.#commentsModel.comments);
+    return comments;
+  };
 
   init(movie) {
     this.#movie = movie;
     const prevMovieCardComponent = this.#movieCardComponent;
 
-    this.#movieCardComponent = new MovieCardView(movie, this.comments);
+    this.#movieCardComponent = new MovieCardView(movie, this.#movie.comments);
 
     this.#movieCardComponent.setOpenPopupHandler(() => {
       this.#onMovieClick();
@@ -80,11 +81,12 @@ export default class MoviePresenter {
     return !!this.#popupComponent;
   }
 
-  openPopup(data = this.#movie) {
+  openPopup = async (data = this.#movie) => {
     this.#movie = data;
     this.#resetPopup();
+    const comments = await this.#commentsModel.init(this.#movie.id).then(() => this.#commentsModel.comments);
     const prevPopupComponent = this.#popupComponent;
-    this.#popupComponent = new PopupView(this.#movie, this.comments, this.#commentsModel);
+    this.#popupComponent = new PopupView(this.#movie, comments, this.#commentsModel);
     this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
     this.#popupComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
     this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
@@ -97,7 +99,7 @@ export default class MoviePresenter {
     if (prevPopupComponent === null) {
       render(this.#popupComponent, this.#popupContainer, RenderPosition.AFTEREND);
     }
-  }
+  };
 
   #onClickClosePopup = () => {
     this.#closePopup(this.#onEscKeyDown);
