@@ -82,9 +82,9 @@ export default class MoviePresenter {
   }
 
   openPopup = async (data = this.#movie) => {
+    const comments = await this.#commentsModel.init(this.#movie.id).then(() => this.#commentsModel.comments);
     this.#movie = data;
     this.#resetPopup();
-    const comments = await this.#commentsModel.init(this.#movie.id).then(() => this.#commentsModel.comments);
     const prevPopupComponent = this.#popupComponent;
     this.#popupComponent = new PopupView(this.#movie, comments, this.#commentsModel);
     this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);

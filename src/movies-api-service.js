@@ -45,9 +45,9 @@ export default class MoviesApiService extends ApiService {
         'genre': movie.filmInfo.genre,
         'description': movie.filmInfo.description
       },
-      'use_details': {
-        'watchlist': movie.userDetails.wathclist,
-        'alreadyWatched': movie.userDetails.alreadyWatched,
+      'user_details': {
+        'watchlist': movie.userDetails.watchlist,
+        'already_watched': movie.userDetails.alreadyWatched,
         'watching_date': movie.userDetails.watchingDate,
         'favorite': movie.userDetails.favorite
       }
