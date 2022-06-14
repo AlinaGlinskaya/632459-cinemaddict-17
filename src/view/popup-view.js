@@ -272,7 +272,6 @@ export default class PopupView extends AbstractStatefulView {
   #addNewCommentHandler = (evt) => {
     if (evt.ctrlKey && evt.keyCode === 13) {
       const comment = {
-        id: '2',
         author: 'Author',
         date: new Date(),
         comment: evt.target.value,

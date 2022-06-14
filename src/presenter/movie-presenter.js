@@ -24,11 +24,6 @@ export default class MoviePresenter {
     this.#commentsModel.addObserver(this.#changeData);
   }
 
-  getComments = async () => {
-    const comments =  await this.#commentsModel.init(this.#movie.id).then(() => this.#commentsModel.comments);
-    return comments;
-  };
-
   init(movie) {
     this.#movie = movie;
     const prevMovieCardComponent = this.#movieCardComponent;

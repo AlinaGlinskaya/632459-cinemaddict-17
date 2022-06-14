@@ -22,28 +22,39 @@ export default class CommentsModel extends Observable {
     }
   };
 
-  addComment = (updateType, updatedMovie, updatedComment) => {
-    this.#comments = [
-      updatedComment,
-      ...this.#comments,
-    ];
+  addComment = async (updateType, updatedMovie, updatedComment) => {
+    try {
+      const newComment = await this.#commentsApiService.addComment(updatedMovie, updatedComment);
+      this.#comments = [
+        newComment,
+        ...this.#comments,
+      ];
 
-    this._notify(updateType, updatedMovie);
+      this._notify(updateType, updatedMovie);
+
+    } catch(err) {
+      throw new Error('Can\'t add comment');
+    }
   };
 
-  deleteComment = (updateType, updatedMovie, updatedComment) => {
+  deleteComment = async (updateType, updatedMovie, updatedComment) => {
     const index = this.#comments.findIndex((comment) => comment.id === updatedComment);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
 
-    this.#comments = [
-      ...this.#comments.slice(0, index),
-      ...this.#comments.slice(index + 1),
-    ];
+    try {
+      await this.#commentsApiService.deleteComment(updatedComment);
 
+      this.#comments = [
+        ...this.#comments.slice(0, index),
+        ...this.#comments.slice(index + 1),
+      ];
 
-    this._notify(updateType, updatedMovie);
+      this._notify(updateType, updatedMovie);
+    } catch(err) {
+      throw new Error('Can\'t delete comment');
+    }
   };
 }
