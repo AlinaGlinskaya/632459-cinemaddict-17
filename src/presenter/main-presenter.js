@@ -12,8 +12,13 @@ import {sortByDate, sortByRating} from '../utils/movie';
 import {SortType, UserAction, UpdateType, FilterType} from '../const';
 import {filter} from '../utils/filter';
 import LoadingMoviesView from '../view/loading-movies-view';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const MOVIES_COUNT_PER_STEP = 5;
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 500,
+};
 
 export default class MainPresenter {
   #popupContainer = null;
@@ -21,6 +26,7 @@ export default class MainPresenter {
   #filterModel = null;
   #moviesModel = null;
   #commentsModel = null;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(popupContainer, moviesContainer, filterModel, moviesModel, commentsModel) {
     this.#popupContainer = popupContainer;
@@ -208,9 +214,10 @@ export default class MainPresenter {
   };
 
   #onViewAction = async (actionType, updateType, updateMovie, updateComment) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
-        this.#moviesModel.updateMovie(updateType, updateMovie);
+        await this.#moviesModel.updateMovie(updateType, updateMovie);
         break;
       case UserAction.ADD_COMMENT:
         this.#moviePresenters.forEach((presenters) => {
@@ -259,6 +266,7 @@ export default class MainPresenter {
         }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #onClickPopupReset = () => {

@@ -1,7 +1,8 @@
 import MovieCardView from '../view/movie-card-view';
-import PopupView from '../view/popup-view';
+import PopupSectionView from '../view/popup-section-view';
 import {render, replace, remove, RenderPosition} from '../framework/render';
 import {UserAction, UpdateType} from '../const';
+import PopupFormView from '../view/popup-form-view';
 
 const body = document.querySelector('body');
 
@@ -14,6 +15,7 @@ export default class MoviePresenter {
   #movie = null;
   #resetPopup = null;
   #commentsModel = null;
+  #popupSectionComponent = null;
 
   constructor(container, popupContainer, changeData, resetPopup, commentsModel) {
     this.#container = container;
@@ -60,10 +62,10 @@ export default class MoviePresenter {
   }
 
   #closePopup() {
-    remove(this.#popupComponent);
+    remove(this.#popupSectionComponent);
     body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onEscKeyDown);
-    this.#popupComponent = null;
+    this.#popupSectionComponent = null;
   }
 
   #onEscKeyDown = (evt) => {
@@ -73,15 +75,16 @@ export default class MoviePresenter {
   };
 
   isOpenPopup() {
-    return !!this.#popupComponent;
+    return !!this.#popupSectionComponent;
   }
 
   openPopup = async (data = this.#movie) => {
     const comments = await this.#commentsModel.init(this.#movie.id).then(() => this.#commentsModel.comments);
     this.#movie = data;
     this.#resetPopup();
-    const prevPopupComponent = this.#popupComponent;
-    this.#popupComponent = new PopupView(this.#movie, comments, this.#commentsModel);
+    const prevPopupComponent = this.#popupSectionComponent;
+    this.#popupSectionComponent = new PopupSectionView();
+    this.#popupComponent = new PopupFormView(this.#movie, comments, this.#commentsModel);
     this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
     this.#popupComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
     this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
@@ -92,7 +95,8 @@ export default class MoviePresenter {
     document.addEventListener('keydown', this.#onEscKeyDown);
 
     if (prevPopupComponent === null) {
-      render(this.#popupComponent, this.#popupContainer, RenderPosition.AFTEREND);
+      render(this.#popupSectionComponent, this.#popupContainer, RenderPosition.AFTEREND);
+      render(this.#popupComponent, this.#popupSectionComponent.element);
     }
   };
 
@@ -101,7 +105,7 @@ export default class MoviePresenter {
   };
 
   resetPopupView = () => {
-    if (this.#popupComponent === null) {
+    if (this.#popupSectionComponent === null) {
       return;
     }
     this.#closePopup(this.#onEscKeyDown);
@@ -120,7 +124,7 @@ export default class MoviePresenter {
   }
 
   setAborting() {
-    //
+    this.#popupComponent.shake(this.resetPopupForm);
   }
 
   #onClickAddToWatchlist = () => {
@@ -160,6 +164,6 @@ export default class MoviePresenter {
 
   destroy = () => {
     remove(this.#movieCardComponent);
-    remove(this.#popupComponent);
+    remove(this.#popupSectionComponent);
   };
 }

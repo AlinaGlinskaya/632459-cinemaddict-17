@@ -3,7 +3,7 @@ import {humanizeMovieReleaseDate, humanizeCommentDate, getTimeFromMins} from '..
 import {EMOTIONS} from '../const.js';
 import he from 'he';
 
-const createPopupTemplate = (movie, comments, formData) => {
+const createPopupFormTemplate = (movie, comments, formData) => {
   const {title, alternativeTitle, description, totalRating, poster, runtime, ageRating, director} = movie.filmInfo;
   const {releaseCountry} = movie.filmInfo.release;
   const activeMovieDetailsControlsClassname = 'film-details__control-button--active';
@@ -56,8 +56,7 @@ const createPopupTemplate = (movie, comments, formData) => {
 
   const commentEmotionsTemplate = createCommentEmotionsTemplate(formData.emotion, formData.isFormDisabled);
 
-  return (`<section class="film-details">
-    <form class="film-details__inner" action="" method="get">
+  return (`<form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
         <div class="film-details__close">
           <button class="film-details__close-btn" type="button">close</button>
@@ -144,13 +143,12 @@ const createPopupTemplate = (movie, comments, formData) => {
           </div>
         </section>
       </div>
-    </form>
-  </section>`);
+    </form>`);
 };
 
 const defaultState = {comment: '', emotion: 'smile', isButtonDisabled: false, isFormDisabled: false, deletingId: ''};
 
-export default class PopupView extends AbstractStatefulView {
+export default class PopupFormView extends AbstractStatefulView {
   #movie = null;
   #button = null;
   #form = null;
@@ -171,7 +169,7 @@ export default class PopupView extends AbstractStatefulView {
   }
 
   get template() {
-    return createPopupTemplate(this.#movie, this.comments, this._state);
+    return createPopupFormTemplate(this.#movie, this.comments, this._state);
   }
 
   _restoreHandlers = () => {
@@ -185,8 +183,7 @@ export default class PopupView extends AbstractStatefulView {
   };
 
   #setInputHandlers() {
-    this.#form = this.element.querySelector('.film-details__inner');
-    this.#form.addEventListener('change', this.#changeCommentHandler);
+    this.element.addEventListener('change', this.#changeCommentHandler);
   }
 
   setClosePopupHandler = (callback) => {
@@ -225,7 +222,7 @@ export default class PopupView extends AbstractStatefulView {
 
   setAddCommentHandler = (callback) => {
     this._callback.addKeydown = callback;
-    this.#form.addEventListener('keydown', this.#addNewCommentHandler);
+    this.element.addEventListener('keydown', this.#addNewCommentHandler);
   };
 
   #addToWatchlistHandler = (evt) => {
