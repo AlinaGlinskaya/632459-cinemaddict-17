@@ -31,7 +31,7 @@ const createPopupTemplate = (movie, comments, formData) => {
 
   const commentsAmount = movieComments.length;
 
-  const createCommentsListTemplate = (commentsList) => commentsList.map(({id, author, comment, date, emotion}) =>
+  const createCommentsListTemplate = (commentsList, isButtonDisabled) => commentsList.map(({id, author, comment, date, emotion}) =>
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
@@ -41,20 +41,20 @@ const createPopupTemplate = (movie, comments, formData) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${humanizeCommentDate(date)}</span>
-          <button class="film-details__comment-delete" data-id="${id}">Delete</button>
+          <button class="film-details__comment-delete" data-id="${id}" ${isButtonDisabled ? 'disabled' : ''}>${(id === formData.deletingId) ? 'Deleting...' : 'Delete'}</button>
         </p>
       </div>
     </li>`).join('');
 
-  const commentsListTemplate = createCommentsListTemplate(movieComments);
+  const commentsListTemplate = createCommentsListTemplate(movieComments, formData.isButtonDisabled);
 
-  const createCommentEmotionsTemplate = (currentEmotion) => EMOTIONS.map((emotion) =>
-    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${currentEmotion === emotion ? 'checked' : ''}>
+  const createCommentEmotionsTemplate = (currentEmotion, isFormDisabled) => EMOTIONS.map((emotion) =>
+    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${currentEmotion === emotion ? 'checked' : ''}${isFormDisabled ? 'disabled' : ''}>
     <label class="film-details__emoji-label" for="emoji-${emotion}">
       <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
     </label>`).join('');
 
-  const commentEmotionsTemplate = createCommentEmotionsTemplate(formData.emotion);
+  const commentEmotionsTemplate = createCommentEmotionsTemplate(formData.emotion, formData.isFormDisabled);
 
   return (`<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -135,7 +135,7 @@ const createPopupTemplate = (movie, comments, formData) => {
             <div class="film-details__add-emoji-label"><img src="images/emoji/${formData.emotion}.png" width="55" height="55" alt="emoji-${formData.emotion}"></div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${formData.comment}</textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${formData.isFormDisabled ? 'disabled' : ''}>${formData.comment}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -148,7 +148,7 @@ const createPopupTemplate = (movie, comments, formData) => {
   </section>`);
 };
 
-const defaultState = {comment: '', emotion: 'smile'};
+const defaultState = {comment: '', emotion: 'smile', isButtonDisabled: false, isFormDisabled: false, deletingId: ''};
 
 export default class PopupView extends AbstractStatefulView {
   #movie = null;

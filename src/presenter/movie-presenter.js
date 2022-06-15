@@ -107,15 +107,20 @@ export default class MoviePresenter {
     this.#closePopup(this.#onEscKeyDown);
   };
 
-  #customUpdateElement(userAction, updateType, movie, comment) {
-    const state = this.#popupComponent ? this.#popupComponent._state : null;
-    this._position = this.#popupComponent ? this.#popupComponent.element.scrollTop : null;
-    this.#changeData(userAction, updateType, movie, comment);
+  setSaving() {
     if (this.#popupComponent) {
-      this.#popupComponent._setState(state);
-      this.#popupComponent.updateElement({state});
-      this.#popupComponent.element.scrollTo(0, this._position);
+      this.#popupComponent.updateElement({...this._state, isFormDisabled: true, isButtonDisabled: true});
     }
+  }
+
+  setDeleting(comment) {
+    if (this.#popupComponent) {
+      this.#popupComponent.updateElement({isFormDisabled: true, isButtonDisabled: true, deletingId: comment});
+    }
+  }
+
+  #customUpdateElement(userAction, updateType, movie, comment) {
+    this.#changeData(userAction, updateType, movie, comment);
   }
 
   #onClickAddToWatchlist = () => {

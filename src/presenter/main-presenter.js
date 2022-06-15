@@ -214,8 +214,20 @@ export default class MainPresenter {
       case UserAction.ADD_COMMENT:
         this.#commentsModel.addComment(updateType, updateMovie, updateComment);
         this.#moviesModel.updateMovie(updateType, updateMovie);
+        this.#moviePresenters.forEach((presenters) => {
+          const moviePresenter = presenters.get(updateMovie);
+          if (moviePresenter && moviePresenter.isOpenPopup()) {
+            moviePresenter.setSaving();
+          }
+        });
         break;
       case UserAction.DELETE_COMMENT:
+        this.#moviePresenters.forEach((presenters) => {
+          const moviePresenter = presenters.get(updateMovie.id);
+          if (moviePresenter && moviePresenter.isOpenPopup()) {
+            moviePresenter.setDeleting(updateComment);
+          }
+        });
         this.#commentsModel.deleteComment(updateType, updateMovie, updateComment);
         this.#moviesModel.updateMovie(updateType, updateMovie);
         break;
