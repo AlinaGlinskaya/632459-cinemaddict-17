@@ -193,6 +193,7 @@ export default class MainPresenter {
         this.#clearMain({resetPresenters: false});
         this.#renderMain();
         this.#updatePopup(data);
+
         break;
       case UpdateType.MAJOR:
         this.#clearMain({resetRenderedMoviesCount: true, resetSortType: true});
@@ -206,30 +207,56 @@ export default class MainPresenter {
     }
   };
 
-  #onViewAction = (actionType, updateType, updateMovie, updateComment) => {
+  #onViewAction = async (actionType, updateType, updateMovie, updateComment) => {
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
         this.#moviesModel.updateMovie(updateType, updateMovie);
         break;
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(updateType, updateMovie, updateComment);
-        this.#moviesModel.updateMovie(updateType, updateMovie);
         this.#moviePresenters.forEach((presenters) => {
-          const moviePresenter = presenters.get(updateMovie);
-          if (moviePresenter && moviePresenter.isOpenPopup()) {
-            moviePresenter.setSaving();
+          if (presenters.has(updateMovie.id)) {
+            const moviePresenter = presenters.get(updateMovie.id);
+            if (moviePresenter.isOpenPopup()) {
+              moviePresenter.setSaving();
+            }
           }
         });
+        try {
+          await this.#commentsModel.addComment(updateType, updateMovie, updateComment);
+          await this.#moviesModel.updateMovie(updateType, updateMovie);
+        } catch(err) {
+          this.#moviePresenters.forEach((presenters) => {
+            if (presenters.has(updateMovie.id)) {
+              const moviePresenter = presenters.get(updateMovie.id);
+              if (moviePresenter.isOpenPopup()) {
+                moviePresenter.setAborting();
+              }
+            }
+          });
+        }
         break;
       case UserAction.DELETE_COMMENT:
         this.#moviePresenters.forEach((presenters) => {
-          const moviePresenter = presenters.get(updateMovie.id);
-          if (moviePresenter && moviePresenter.isOpenPopup()) {
-            moviePresenter.setDeleting(updateComment);
+          if (presenters.has(updateMovie.id)) {
+            const moviePresenter = presenters.get(updateMovie.id);
+            if (moviePresenter.isOpenPopup()) {
+              moviePresenter.setDeleting();
+            }
           }
         });
-        this.#commentsModel.deleteComment(updateType, updateMovie, updateComment);
-        this.#moviesModel.updateMovie(updateType, updateMovie);
+        try {
+          await this.#commentsModel.deleteComment(updateType, updateMovie, updateComment);
+          await this.#moviesModel.updateMovie(updateType, updateMovie);
+        } catch(err) {
+          this.#moviePresenters.forEach((presenters) => {
+            if (presenters.has(updateMovie.id)) {
+              const moviePresenter = presenters.get(updateMovie.id);
+              if (moviePresenter.isOpenPopup()) {
+                moviePresenter.setAborting();
+              }
+            }
+          });
+        }
         break;
     }
   };

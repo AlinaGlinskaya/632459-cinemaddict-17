@@ -108,51 +108,51 @@ export default class MoviePresenter {
   };
 
   setSaving() {
-    if (this.#popupComponent) {
-      this.#popupComponent.updateElement({...this._state, isFormDisabled: true, isButtonDisabled: true});
-    }
+    this.#popupComponent.updateElement({isFormDisabled: true, isButtonDisabled: true});
   }
 
   setDeleting(comment) {
-    if (this.#popupComponent) {
-      this.#popupComponent.updateElement({isFormDisabled: true, isButtonDisabled: true, deletingId: comment});
-    }
+    this.#popupComponent.updateElement({isFormDisabled: true, isButtonDisabled: true, deletingId: comment});
   }
 
-  #customUpdateElement(userAction, updateType, movie, comment) {
-    this.#changeData(userAction, updateType, movie, comment);
+  resetPopupForm() {
+    this.#popupComponent.updateElement({isFormDisabled: false, isButtonDisabled: false, deletingId: ''});
+  }
+
+  setAborting() {
+    //
   }
 
   #onClickAddToWatchlist = () => {
-    this.#customUpdateElement(
+    this.#changeData(
       UserAction.UPDATE_MOVIE,
       UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 
   #onClickAddToWatched = () => {
-    this.#customUpdateElement(
+    this.#changeData(
       UserAction.UPDATE_MOVIE,
       UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
   };
 
   #onClickAddToFavorite = () => {
-    this.#customUpdateElement(
+    this.#changeData(
       UserAction.UPDATE_MOVIE,
       UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
   #onClickDeleteComment = (movie, comment) => {
-    this.#customUpdateElement(
+    this.#changeData(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
       movie, comment);
   };
 
   #onKeyDownAddComment = (movie, comment) => {
-    this.#customUpdateElement(
+    this.#changeData(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
       movie, comment);
