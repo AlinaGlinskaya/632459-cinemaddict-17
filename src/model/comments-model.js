@@ -13,12 +13,17 @@ export default class CommentsModel extends Observable {
     return this.#comments;
   }
 
-  init = async (movieId) => {
+  isCommentsLoaded(loading) {
+    return !!loading;
+  }
+
+  init = async (movieId, loading) => {
     try {
       const comments = await this.#commentsApiService.getComments(movieId);
       this.#comments = comments;
     } catch(err) {
       this.#comments = [];
+      this.isCommentsLoaded(loading);
     }
   };
 

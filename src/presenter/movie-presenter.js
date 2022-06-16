@@ -82,7 +82,7 @@ export default class MoviePresenter {
     const comments = await this.#commentsModel.init(this.#movie.id).then(() => this.#commentsModel.comments);
     this.#movie = data;
     this.#resetPopup();
-    const prevPopupComponent = this.#popupSectionComponent;
+    const prevPopupSectionComponent = this.#popupSectionComponent;
     this.#popupSectionComponent = new PopupSectionView();
     this.#popupFormComponent = new PopupFormView(this.#movie, comments, this.#commentsModel);
     this.#popupFormComponent.setClosePopupHandler(this.#onClickClosePopup);
@@ -95,7 +95,7 @@ export default class MoviePresenter {
     document.addEventListener('keydown', this.#onEscKeyDown);
 
 
-    if (prevPopupComponent === null) {
+    if (prevPopupSectionComponent === null) {
       render(this.#popupSectionComponent, this.#popupContainer, RenderPosition.AFTEREND);
       render(this.#popupFormComponent, this.#popupSectionComponent.element);
     }

@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 const humanizeMovieReleaseYearDate = (date) => dayjs(date).format('YYYY');
 const humanizeMovieReleaseDate = (date) => dayjs(date).format('DD MMMM YYYY');
-const humanizeCommentDate = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
+const humanizeCommentDate = (date) => dayjs(date).fromNow();
 
 const getTimeFromMins = (mins) => {
   const runtime = dayjs.duration(mins, 'minutes');
@@ -15,4 +17,6 @@ const sortByDate = (movieA, movieB) => dayjs(movieB.filmInfo.release.date).diff(
 
 const sortByRating = (movieA, movieB) => movieB.filmInfo.totalRating - movieA.filmInfo.totalRating;
 
-export {humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins, sortByDate, sortByRating};
+const sortByCommentsAmount = (movieA, movieB) => movieB.comments.length - movieA.comments.length;
+
+export {humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins, sortByDate, sortByRating, sortByCommentsAmount};

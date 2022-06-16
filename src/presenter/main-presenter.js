@@ -8,7 +8,7 @@ import {remove, render, RenderPosition} from '../framework/render';
 import MoviesListTitleView from '../view/movies-list-title-view';
 import MoviesListEmptyView from '../view/movies-list-empty-view';
 import MoviePresenter from './movie-presenter';
-import {sortByDate, sortByRating} from '../utils/movie';
+import {sortByDate, sortByRating, sortByCommentsAmount} from '../utils/movie';
 import {SortType, UserAction, UpdateType, FilterType} from '../const';
 import {filter} from '../utils/filter';
 import LoadingMoviesView from '../view/loading-movies-view';
@@ -124,14 +124,20 @@ export default class MainPresenter {
   }
 
   #renderRated() {
-    const movies = this.movies.slice(0, 2);
+    const movies = this.movies.sort(sortByRating).slice(0, 2);
+    if (movies.length === 0) {
+      return;
+    }
     render(this.#moviesExtraListRatedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerRatedComponent, this.#moviesExtraListRatedComponent.element);
     this.#renderMovies(movies, this.#moviesListContainerRatedComponent, this.#moviePresenterRated);
   }
 
   #renderCommented() {
-    const movies = this.movies.slice(3, 5);
+    const movies = this.movies.sort(sortByCommentsAmount).slice(0, 2);
+    if (movies.length === 0) {
+      return;
+    }
     render(this.#moviesExtraListCommentedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerCommentedComponent, this.#moviesExtraListCommentedComponent.element);
     this.#renderMovies(movies, this.#moviesListContainerCommentedComponent, this.#moviePresenterCommented);
@@ -225,13 +231,14 @@ export default class MainPresenter {
   };
 
   #onViewAction = async (actionType, updateType, updateMovie, updateComment) => {
-    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
+        this.#uiBlocker.block();
         await this.#moviesModel.updateMovie(updateType, updateMovie);
         this.#uiBlocker.unblock();
         break;
       case UserAction.ADD_COMMENT:
+        this.#uiBlocker.block();
         this.#moviePresenters.forEach((presenters) => {
           if (presenters.has(updateMovie.id)) {
             const moviePresenter = presenters.get(updateMovie.id);
@@ -243,6 +250,7 @@ export default class MainPresenter {
         try {
           await this.#commentsModel.addComment(updateType, updateMovie, updateComment);
           await this.#moviesModel.updateMovie(updateType, updateMovie);
+          this.#uiBlocker.unblock();
         } catch(err) {
           this.#moviePresenters.forEach((presenters) => {
             if (presenters.has(updateMovie.id)) {
@@ -253,7 +261,6 @@ export default class MainPresenter {
             }
           });
         }
-        this.#uiBlocker.unblock();
         break;
       case UserAction.DELETE_COMMENT:
         this.#moviePresenters.forEach((presenters) => {
@@ -277,7 +284,6 @@ export default class MainPresenter {
             }
           });
         }
-        this.#uiBlocker.unblock();
         break;
     }
   };
