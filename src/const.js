@@ -13,6 +13,18 @@ const SortType = {
   RATING: 'rating'
 };
 
+const UserRank = {
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUFF: 'Movie Buff'
+};
+
+const UserHistory = {
+  NOVICE: 1,
+  FAN: 11,
+  MOVIE_BUFF: 21
+};
+
 const UserAction = {
   UPDATE_MOVIE: 'UPDATE_MOVIE',
   ADD_COMMENT: 'ADD_COMMENT',
@@ -26,4 +38,4 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-export {EMOTIONS, FilterType, SortType, UserAction, UpdateType};
+export {EMOTIONS, FilterType, SortType, UserAction, UpdateType, UserRank, UserHistory};

@@ -13,7 +13,11 @@ import {SortType, UserAction, UpdateType, FilterType} from '../const';
 import {filter} from '../utils/filter';
 import LoadingMoviesView from '../view/loading-movies-view';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import MoviesStaticticsView from '../view/movies-statistics-view';
+import UserRankView from '../view/user-rank-view';
 
+const siteFooterStatisticsElement = document.querySelector('.footer__statistics');
+const siteHeaderElement = document.querySelector('.header');
 const MOVIES_COUNT_PER_STEP = 5;
 const TimeLimit = {
   LOWER_LIMIT: 350,
@@ -51,6 +55,8 @@ export default class MainPresenter {
   #moviesListEmptyComponent = null;
   #moviesListTitleComponent = new MoviesListTitleView();
   #loadingMoviesComponent = new LoadingMoviesView();
+  #userRankComponent = null;
+  #moviesStatisticsComponent = null;
   #moviePresenter = new Map();
   #moviePresenterRated = new Map();
   #moviePresenterCommented = new Map();
@@ -140,6 +146,9 @@ export default class MainPresenter {
       return;
     }
 
+    this.#userRankComponent = new UserRankView(this.#moviesModel.movies);
+    render(this.#userRankComponent, siteHeaderElement);
+
     if (moviesCount === 0) {
       this.#moviesListEmptyComponent = new MoviesListEmptyView(this.#filterType);
       render(this.#moviesComponent, this.#moviesContainer);
@@ -161,6 +170,8 @@ export default class MainPresenter {
     this.#renderMovies(movies.slice(0, Math.min(moviesCount, this.#renderedMoviesCount)), this.#moviesListContainerComponent, this.#moviePresenter);
     this.#renderRated();
     this.#renderCommented();
+    this.#moviesStatisticsComponent = new MoviesStaticticsView(moviesCount);
+    render(this.#moviesStatisticsComponent, siteFooterStatisticsElement);
   }
 
   #onClickShowMore = () => {
@@ -301,6 +312,8 @@ export default class MainPresenter {
     remove(this.#loadingMoviesComponent);
     remove(this.#moviesExtraListCommentedComponent);
     remove(this.#moviesExtraListRatedComponent);
+    remove(this.#userRankComponent);
+    remove(this.#moviesStatisticsComponent);
 
     this.#moviesListContainerComponent.clear();
     this.#moviesListContainerRatedComponent.clear();
