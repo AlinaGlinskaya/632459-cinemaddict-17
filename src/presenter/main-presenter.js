@@ -21,7 +21,7 @@ const siteHeaderElement = document.querySelector('.header');
 const MOVIES_COUNT_PER_STEP = 5;
 const TimeLimit = {
   LOWER_LIMIT: 350,
-  UPPER_LIMIT: 500,
+  UPPER_LIMIT: 1000,
 };
 
 export default class MainPresenter {
@@ -229,6 +229,7 @@ export default class MainPresenter {
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
         await this.#moviesModel.updateMovie(updateType, updateMovie);
+        this.#uiBlocker.unblock();
         break;
       case UserAction.ADD_COMMENT:
         this.#moviePresenters.forEach((presenters) => {
@@ -252,13 +253,14 @@ export default class MainPresenter {
             }
           });
         }
+        this.#uiBlocker.unblock();
         break;
       case UserAction.DELETE_COMMENT:
         this.#moviePresenters.forEach((presenters) => {
           if (presenters.has(updateMovie.id)) {
             const moviePresenter = presenters.get(updateMovie.id);
             if (moviePresenter.isOpenPopup()) {
-              moviePresenter.setDeleting();
+              moviePresenter.setDeleting(updateComment);
             }
           }
         });
@@ -275,9 +277,9 @@ export default class MainPresenter {
             }
           });
         }
+        this.#uiBlocker.unblock();
         break;
     }
-    this.#uiBlocker.unblock();
   };
 
   #onClickPopupReset = () => {

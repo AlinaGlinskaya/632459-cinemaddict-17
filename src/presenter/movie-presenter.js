@@ -10,7 +10,7 @@ export default class MoviePresenter {
   #container = null;
   #popupContainer = null;
   #movieCardComponent = null;
-  #popupComponent = null;
+  #popupFormComponent = null;
   #changeData = null;
   #movie = null;
   #resetPopup = null;
@@ -52,7 +52,7 @@ export default class MoviePresenter {
     }
     remove(prevMovieCardComponent);
 
-    if (this.#popupComponent) {
+    if (this.#popupSectionComponent) {
       this.openPopup();
     }
   }
@@ -84,19 +84,20 @@ export default class MoviePresenter {
     this.#resetPopup();
     const prevPopupComponent = this.#popupSectionComponent;
     this.#popupSectionComponent = new PopupSectionView();
-    this.#popupComponent = new PopupFormView(this.#movie, comments, this.#commentsModel);
-    this.#popupComponent.setClosePopupHandler(this.#onClickClosePopup);
-    this.#popupComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
-    this.#popupComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
-    this.#popupComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
-    this.#popupComponent.setDeleteCommentHandlers(this.#onClickDeleteComment);
-    this.#popupComponent.setAddCommentHandler(this.#onKeyDownAddComment);
+    this.#popupFormComponent = new PopupFormView(this.#movie, comments, this.#commentsModel);
+    this.#popupFormComponent.setClosePopupHandler(this.#onClickClosePopup);
+    this.#popupFormComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
+    this.#popupFormComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
+    this.#popupFormComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
+    this.#popupFormComponent.setDeleteCommentHandlers(this.#onClickDeleteComment);
+    this.#popupFormComponent.setAddCommentHandler(this.#onKeyDownAddComment);
     body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onEscKeyDown);
 
+
     if (prevPopupComponent === null) {
       render(this.#popupSectionComponent, this.#popupContainer, RenderPosition.AFTEREND);
-      render(this.#popupComponent, this.#popupSectionComponent.element);
+      render(this.#popupFormComponent, this.#popupSectionComponent.element);
     }
   };
 
@@ -112,19 +113,18 @@ export default class MoviePresenter {
   };
 
   setSaving() {
-    this.#popupComponent.updateElement({isFormDisabled: true, isButtonDisabled: true});
+    this.#popupFormComponent.updateElement({isFormDisabled: true, isButtonDisabled: true});
   }
 
   setDeleting(comment) {
-    this.#popupComponent.updateElement({isFormDisabled: true, isButtonDisabled: true, deletingId: comment});
-  }
-
-  resetPopupForm() {
-    this.#popupComponent.updateElement({isFormDisabled: false, isButtonDisabled: false, deletingId: ''});
+    this.#popupFormComponent.updateElement({isFormDisabled: true, isButtonDisabled: true, deletingId: comment});
   }
 
   setAborting() {
-    this.#popupComponent.shake(this.resetPopupForm);
+    const resetPopupForm = () => {
+      this.#popupFormComponent.updateElement({isFormDisabled: false, isButtonDisabled: false, deletingId: ''});
+    };
+    this.#popupFormComponent.shake(resetPopupForm);
   }
 
   #onClickAddToWatchlist = () => {

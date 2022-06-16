@@ -151,7 +151,6 @@ const defaultState = {comment: '', emotion: 'smile', isButtonDisabled: false, is
 export default class PopupFormView extends AbstractStatefulView {
   #movie = null;
   #button = null;
-  #form = null;
   #comments = null;
   #commentsModel = null;
   constructor(movie, comments, commentsModel) {
