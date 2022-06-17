@@ -16,6 +16,8 @@ export default class MoviePresenter {
   #resetPopup = null;
   #commentsModel = null;
   #popupSectionComponent = null;
+  #scrollPosition = null;
+  #popupFormInfo;
 
   constructor(container, popupContainer, changeData, resetPopup, commentsModel) {
     this.#container = container;
@@ -98,6 +100,8 @@ export default class MoviePresenter {
     if (prevPopupSectionComponent === null) {
       render(this.#popupSectionComponent, this.#popupContainer, RenderPosition.AFTEREND);
       render(this.#popupFormComponent, this.#popupSectionComponent.element);
+      this.#popupSectionComponent.element.scrollTo(0, this.#scrollPosition);
+      this.#popupFormComponent.updateElement(this.#popupFormInfo);
     }
   };
 
@@ -127,36 +131,47 @@ export default class MoviePresenter {
     this.#popupFormComponent.shake(resetPopupForm);
   }
 
+  #customUpdateElement(isSavingUserInfo, userAction, updateType, movie, comment) {
+    this.#scrollPosition = this.#popupSectionComponent.element.scrollTop;
+    this.#popupFormInfo = isSavingUserInfo ? this.#popupFormComponent._state : '';
+    this.#changeData(userAction, updateType, movie, comment);
+  }
+
   #onClickAddToWatchlist = () => {
-    this.#changeData(
+    this.#customUpdateElement(
+      true,
       UserAction.UPDATE_MOVIE,
       UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 
   #onClickAddToWatched = () => {
-    this.#changeData(
+    this.#customUpdateElement(
+      true,
       UserAction.UPDATE_MOVIE,
       UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
   };
 
   #onClickAddToFavorite = () => {
-    this.#changeData(
+    this.#customUpdateElement(
+      true,
       UserAction.UPDATE_MOVIE,
       UpdateType.MINOR,
       {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
   #onClickDeleteComment = (movie, comment) => {
-    this.#changeData(
+    this.#customUpdateElement(
+      true,
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
       movie, comment);
   };
 
   #onKeyDownAddComment = (movie, comment) => {
-    this.#changeData(
+    this.#customUpdateElement(
+      false,
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
       movie, comment);
