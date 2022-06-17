@@ -10,13 +10,14 @@ const AUTHORIZATION = 'Basic ljdfsd7d8fsdjfklsdjfls';
 const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 
 
-const siteMainElement = document.querySelector('.main');
-const siteFooterElement = document.querySelector('.footer');
+const bodyElement = document.querySelector('body');
+const siteMainElement = bodyElement.querySelector('.main');
+const siteFooterElement = bodyElement.querySelector('.footer');
 const filterModel = new FilterModel();
 const moviesModel = new MoviesModel(new MoviesApiService(END_POINT, AUTHORIZATION));
 const commentsModel = new CommentsModel(new CommentsApiService(END_POINT, AUTHORIZATION));
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, moviesModel);
-const mainPresenter = new MainPresenter(siteFooterElement, siteMainElement, filterModel, moviesModel, commentsModel);
+const mainPresenter = new MainPresenter(siteFooterElement, siteMainElement, filterModel, moviesModel, commentsModel, bodyElement);
 
 filterPresenter.init();
 mainPresenter.init();

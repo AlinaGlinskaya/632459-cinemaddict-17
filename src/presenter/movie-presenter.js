@@ -4,11 +4,9 @@ import {render, replace, remove, RenderPosition} from '../framework/render';
 import {UserAction, UpdateType} from '../const';
 import PopupFormView from '../view/popup-form-view';
 
-const body = document.querySelector('body');
-
 export default class MoviePresenter {
   #container = null;
-  #popupContainer = null;
+  #footerElement = null;
   #movieCardComponent = null;
   #popupFormComponent = null;
   #changeData = null;
@@ -17,14 +15,16 @@ export default class MoviePresenter {
   #commentsModel = null;
   #popupSectionComponent = null;
   #scrollPosition = null;
-  #popupFormInfo;
+  #popupFormInfo = null;
+  #popupContainer = null;
 
-  constructor(container, popupContainer, changeData, resetPopup, commentsModel) {
+  constructor(container, footerElement, changeData, resetPopup, commentsModel, popupContainer) {
     this.#container = container;
-    this.#popupContainer = popupContainer;
+    this.#footerElement = footerElement;
     this.#changeData = changeData;
     this.#resetPopup = resetPopup;
     this.#commentsModel = commentsModel;
+    this.#popupContainer = popupContainer;
     this.#commentsModel.addObserver(this.#changeData);
   }
 
@@ -65,7 +65,7 @@ export default class MoviePresenter {
 
   #closePopup() {
     remove(this.#popupSectionComponent);
-    body.classList.remove('hide-overflow');
+    this.#popupContainer.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onEscKeyDown);
     this.#popupSectionComponent = null;
   }
@@ -76,7 +76,7 @@ export default class MoviePresenter {
     }
   };
 
-  isOpenPopup() {
+  isOpenedPopup() {
     return !!this.#popupSectionComponent;
   }
 
@@ -93,12 +93,12 @@ export default class MoviePresenter {
     this.#popupFormComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
     this.#popupFormComponent.setDeleteCommentHandlers(this.#onClickDeleteComment);
     this.#popupFormComponent.setAddCommentHandler(this.#onKeyDownAddComment);
-    body.classList.add('hide-overflow');
+    this.#popupContainer.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onEscKeyDown);
 
 
     if (prevPopupSectionComponent === null) {
-      render(this.#popupSectionComponent, this.#popupContainer, RenderPosition.AFTEREND);
+      render(this.#popupSectionComponent, this.#footerElement, RenderPosition.AFTEREND);
       render(this.#popupFormComponent, this.#popupSectionComponent.element);
       this.#popupSectionComponent.element.scrollTo(0, this.#scrollPosition);
       this.#popupFormComponent.updateElement(this.#popupFormInfo);

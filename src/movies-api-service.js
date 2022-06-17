@@ -25,7 +25,7 @@ export default class MoviesApiService extends ApiService {
   };
 
   #adaptToServer(movie) {
-    const adaptedMovie = {
+    return {
       'id': movie.id,
       'comments': movie.comments,
       'film_info': {
@@ -52,7 +52,5 @@ export default class MoviesApiService extends ApiService {
         'favorite': movie.userDetails.favorite
       }
     };
-
-    return adaptedMovie;
   }
 }

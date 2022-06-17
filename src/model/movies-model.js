@@ -48,7 +48,7 @@ export default class MoviesModel extends Observable {
   };
 
   #adaptToClient(movie) {
-    const adaptedMovie = {
+    return {
       id: movie.id,
       comments: movie.comments,
       filmInfo: {
@@ -75,8 +75,6 @@ export default class MoviesModel extends Observable {
         favorite: movie.user_details.favorite
       }
     };
-
-    return adaptedMovie;
   }
 
 }

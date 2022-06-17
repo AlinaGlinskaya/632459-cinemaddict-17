@@ -10,12 +10,12 @@ import MoviesListEmptyView from '../view/movies-list-empty-view';
 import MoviePresenter from './movie-presenter';
 import {sortByDate, sortByRating, sortByCommentsAmount} from '../utils/movie';
 import {SortType, UserAction, UpdateType, FilterType} from '../const';
-import {filter} from '../utils/filter';
+import {Filter} from '../utils/filter';
 import LoadingMoviesView from '../view/loading-movies-view';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import MoviesStaticticsView from '../view/movies-statistics-view';
 import UserRankView from '../view/user-rank-view';
-import {getRandomMovies, isRatingNull, isCommentsAmountNull} from '../utils/movie';
+import {getRandomMovies, getRatedMoviesCount, getCommentedMoviesCount} from '../utils/movie';
 
 const siteFooterStatisticsElement = document.querySelector('.footer__statistics');
 const siteHeaderElement = document.querySelector('.header');
@@ -27,19 +27,21 @@ const TimeLimit = {
 };
 
 export default class MainPresenter {
-  #popupContainer = null;
+  #footerElement = null;
   #moviesContainer = null;
   #filterModel = null;
   #moviesModel = null;
   #commentsModel = null;
+  #popupContainer = null;
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
-  constructor(popupContainer, moviesContainer, filterModel, moviesModel, commentsModel) {
-    this.#popupContainer = popupContainer;
+  constructor(footerElement, moviesContainer, filterModel, moviesModel, commentsModel, popupContainer) {
+    this.#footerElement = footerElement;
     this.#moviesContainer = moviesContainer;
     this.#filterModel = filterModel;
     this.#moviesModel = moviesModel;
     this.#commentsModel = commentsModel;
+    this.#popupContainer = popupContainer;
 
     this.#moviesModel.addObserver(this.#onModelEvent);
     this.#filterModel.addObserver(this.#onModelEvent);
@@ -74,7 +76,7 @@ export default class MainPresenter {
     const movies = this.#moviesModel.movies;
     const filteredMovies = [];
     for (const movie of movies) {
-      if(filter[this.#filterType](movie)) {
+      if(Filter[this.#filterType](movie)) {
         filteredMovies.push(movie);
       }
     }
@@ -114,7 +116,7 @@ export default class MainPresenter {
       return;
     }
 
-    const moviePresenter = new MoviePresenter(container, this.#popupContainer, this.#onViewAction, this.#onClickPopupReset, this.#commentsModel);
+    const moviePresenter = new MoviePresenter(container, this.#footerElement, this.#onViewAction, this.#onClickPopupReset, this.#commentsModel, this.#popupContainer);
     moviePresenter.init(movie);
     mapPresenters.set(movie.id, moviePresenter);
   }
@@ -125,9 +127,9 @@ export default class MainPresenter {
     this.#buttonShowMoreComponent.setShowMoviesHandler(this.#onClickShowMore);
   }
 
-  #renderRated() {
+  #renderMostRated() {
     const movies = this.movies.slice();
-    if (isRatingNull(movies) === 0) {
+    if (getRatedMoviesCount(movies) === 0) {
       return;
     }
     const isRepeatingMovies = movies
@@ -142,9 +144,9 @@ export default class MainPresenter {
     this.#renderMovies(ratedMovies, this.#moviesListContainerRatedComponent, this.#moviePresenterRated);
   }
 
-  #renderCommented() {
+  #renderMostCommented() {
     const movies = this.movies.slice();
-    if (isCommentsAmountNull(movies) === 0) {
+    if (getCommentedMoviesCount(movies) === 0) {
       return;
     }
     const isRepeatingMovies = movies
@@ -169,7 +171,7 @@ export default class MainPresenter {
     }
 
     this.#userRankComponent = new UserRankView(this.#moviesModel.movies);
-    if (this.#userRankComponent.isHistory()) {
+    if (this.#userRankComponent.isMoviesWatched()) {
       render(this.#userRankComponent, siteHeaderElement);
     }
 
@@ -192,8 +194,8 @@ export default class MainPresenter {
     }
 
     this.#renderMovies(movies.slice(0, Math.min(moviesCount, this.#renderedMoviesCount)), this.#moviesListContainerComponent, this.#moviePresenter);
-    this.#renderRated();
-    this.#renderCommented();
+    this.#renderMostRated();
+    this.#renderMostCommented();
     this.#moviesStatisticsComponent = new MoviesStaticticsView(moviesCount);
     render(this.#moviesStatisticsComponent, siteFooterStatisticsElement);
   }
@@ -214,7 +216,7 @@ export default class MainPresenter {
   #updatePopup(data) {
     this.#moviePresenters.forEach((presenters) => {
       const moviePresenter = presenters.get(data.id);
-      if (moviePresenter && moviePresenter.isOpenPopup()) {
+      if (moviePresenter && moviePresenter.isOpenedPopup()) {
         moviePresenter.openPopup(data);
       }
     });
@@ -229,8 +231,8 @@ export default class MainPresenter {
             moviePresenter.init(data);
           }
         });
-        this.#clearCommented();
-        this.#renderCommented();
+        this.#clearMostCommented();
+        this.#renderMostCommented();
         break;
       case UpdateType.MINOR:
         this.#clearMain({resetPresenters: false});
@@ -262,7 +264,7 @@ export default class MainPresenter {
         this.#moviePresenters.forEach((presenters) => {
           if (presenters.has(updateMovie.id)) {
             const moviePresenter = presenters.get(updateMovie.id);
-            if (moviePresenter.isOpenPopup()) {
+            if (moviePresenter.isOpenedPopup()) {
               moviePresenter.setSaving();
             }
           }
@@ -275,7 +277,7 @@ export default class MainPresenter {
           this.#moviePresenters.forEach((presenters) => {
             if (presenters.has(updateMovie.id)) {
               const moviePresenter = presenters.get(updateMovie.id);
-              if (moviePresenter.isOpenPopup()) {
+              if (moviePresenter.isOpenedPopup()) {
                 moviePresenter.setAborting();
               }
             }
@@ -286,7 +288,7 @@ export default class MainPresenter {
         this.#moviePresenters.forEach((presenters) => {
           if (presenters.has(updateMovie.id)) {
             const moviePresenter = presenters.get(updateMovie.id);
-            if (moviePresenter.isOpenPopup()) {
+            if (moviePresenter.isOpenedPopup()) {
               moviePresenter.setDeleting(updateComment);
             }
           }
@@ -298,7 +300,7 @@ export default class MainPresenter {
           this.#moviePresenters.forEach((presenters) => {
             if (presenters.has(updateMovie.id)) {
               const moviePresenter = presenters.get(updateMovie.id);
-              if (moviePresenter.isOpenPopup()) {
+              if (moviePresenter.isOpenedPopup()) {
                 moviePresenter.setAborting();
               }
             }
@@ -362,7 +364,7 @@ export default class MainPresenter {
     }
   }
 
-  #clearCommented() {
+  #clearMostCommented() {
     this.#moviesListContainerCommentedComponent.clear();
   }
 }

@@ -3,6 +3,8 @@ import {humanizeMovieReleaseDate, humanizeCommentDate, getTimeFromMins} from '..
 import {EMOTIONS} from '../const.js';
 import he from 'he';
 
+const defaultState = {comment: '', emotion: 'smile', isButtonDisabled: false, isFormDisabled: false, deletingId: ''};
+
 const createPopupFormTemplate = (movie, comments, formData) => {
   const {title, alternativeTitle, description, totalRating, poster, runtime, ageRating, director} = movie.filmInfo;
   const {releaseCountry} = movie.filmInfo.release;
@@ -146,8 +148,6 @@ const createPopupFormTemplate = (movie, comments, formData) => {
     </form>`);
 };
 
-const defaultState = {comment: '', emotion: 'smile', isButtonDisabled: false, isFormDisabled: false, deletingId: ''};
-
 export default class PopupFormView extends AbstractStatefulView {
   #movie = null;
   #button = null;
@@ -170,6 +170,12 @@ export default class PopupFormView extends AbstractStatefulView {
   get template() {
     return createPopupFormTemplate(this.#movie, this.comments, this._state);
   }
+
+  #customUpdateElement = (data) => {
+    this._position = this.element.scrollTop;
+    this.updateElement(data);
+    this.element.scrollTo(0, this._position);
+  };
 
   _restoreHandlers = () => {
     this.#setInputHandlers();
@@ -237,12 +243,6 @@ export default class PopupFormView extends AbstractStatefulView {
   #addToFavoriteHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
-  };
-
-  #customUpdateElement = (data) => {
-    this._position = this.element.scrollTop;
-    this.updateElement(data);
-    this.element.scrollTo(0, this._position);
   };
 
   #deleteCommentHandler = (evt) => {

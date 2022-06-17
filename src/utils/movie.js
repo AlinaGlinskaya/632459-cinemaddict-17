@@ -25,9 +25,9 @@ const getRandomMovies = (movies, amount) => {
   return randomMovies;
 };
 
-const isRatingNull = (movies) => movies.filter((movie) => movie.filmInfo.totalRating !== 0).length;
+const getRatedMoviesCount = (movies) => movies.filter((movie) => movie.filmInfo.totalRating !== 0).length;
 
-const isCommentsAmountNull = (movies) => movies.filter((movie) => movie.comments.length !== 0).length;
+const getCommentedMoviesCount = (movies) => movies.filter((movie) => movie.comments.length !== 0).length;
 
 const sortByDate = (movieA, movieB) => dayjs(movieB.filmInfo.release.date).diff(dayjs(movieA.filmInfo.release.date));
 
@@ -35,6 +35,6 @@ const sortByRating = (movieA, movieB) => movieB.filmInfo.totalRating - movieA.fi
 
 const sortByCommentsAmount = (movieA, movieB) => movieB.comments.length - movieA.comments.length;
 
-const getMoviesWatchedCount = (movies) => movies.filter((movie) => movie.userDetails.alreadyWatched).length;
+const getWatchedMoviesCount = (movies) => movies.filter((movie) => movie.userDetails.alreadyWatched).length;
 
-export {humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins, sortByDate, sortByRating, sortByCommentsAmount, getRandomMovies, isRatingNull, isCommentsAmountNull, getMoviesWatchedCount};
+export {humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins, sortByDate, sortByRating, sortByCommentsAmount, getRandomMovies, getRatedMoviesCount, getCommentedMoviesCount, getWatchedMoviesCount};
