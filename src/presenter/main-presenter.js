@@ -15,10 +15,12 @@ import LoadingMoviesView from '../view/loading-movies-view';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import MoviesStaticticsView from '../view/movies-statistics-view';
 import UserRankView from '../view/user-rank-view';
+import {getRandomMovies, isRatingNull, isCommentsAmountNull} from '../utils/movie';
 
 const siteFooterStatisticsElement = document.querySelector('.footer__statistics');
 const siteHeaderElement = document.querySelector('.header');
 const MOVIES_COUNT_PER_STEP = 5;
+const MAX_EXTRA_MOVIES_COUNT = 2;
 const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
@@ -124,23 +126,37 @@ export default class MainPresenter {
   }
 
   #renderRated() {
-    const movies = this.movies.sort(sortByRating).slice(0, 2);
-    if (movies.length === 0) {
+    const movies = this.movies.slice();
+    if (isRatingNull(movies) === 0) {
       return;
     }
+    const isRepeatingMovies = movies
+      .map((movie) => movie.comments.length)
+      .filter((item) => item === movies[0].comments).length === movies.length;
+
+    const ratedMovies = isRepeatingMovies ?
+      getRandomMovies(movies, MAX_EXTRA_MOVIES_COUNT) :
+      movies.sort(sortByRating).slice(0, MAX_EXTRA_MOVIES_COUNT);
     render(this.#moviesExtraListRatedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerRatedComponent, this.#moviesExtraListRatedComponent.element);
-    this.#renderMovies(movies, this.#moviesListContainerRatedComponent, this.#moviePresenterRated);
+    this.#renderMovies(ratedMovies, this.#moviesListContainerRatedComponent, this.#moviePresenterRated);
   }
 
   #renderCommented() {
-    const movies = this.movies.sort(sortByCommentsAmount).slice(0, 2);
-    if (movies.length === 0) {
+    const movies = this.movies.slice();
+    if (isCommentsAmountNull(movies) === 0) {
       return;
     }
+    const isRepeatingMovies = movies
+      .map((movie) => movie.comments.length)
+      .filter((item) => item === movies[0].comments).length === movies.length;
+
+    const commentedMovies = isRepeatingMovies ?
+      getRandomMovies(movies, MAX_EXTRA_MOVIES_COUNT) :
+      movies.sort(sortByCommentsAmount).slice(0, MAX_EXTRA_MOVIES_COUNT);
     render(this.#moviesExtraListCommentedComponent, this.#moviesComponent.element);
     render(this.#moviesListContainerCommentedComponent, this.#moviesExtraListCommentedComponent.element);
-    this.#renderMovies(movies, this.#moviesListContainerCommentedComponent, this.#moviePresenterCommented);
+    this.#renderMovies(commentedMovies, this.#moviesListContainerCommentedComponent, this.#moviePresenterCommented);
   }
 
   #renderMain() {
