@@ -7,7 +7,7 @@ import MoviesApiService from './movies-api-service';
 import CommentsApiService from './comments-api-service';
 
 const AUTHORIZATION = 'Basic ljdfsd7d8fsdjfklsdjfls';
-const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict/';
+const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 
 
 const siteMainElement = document.querySelector('.main');

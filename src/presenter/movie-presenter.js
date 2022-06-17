@@ -132,8 +132,10 @@ export default class MoviePresenter {
   }
 
   #customUpdateElement(isSavingUserInfo, userAction, updateType, movie, comment) {
-    this.#scrollPosition = this.#popupSectionComponent.element.scrollTop;
-    this.#popupFormInfo = isSavingUserInfo ? this.#popupFormComponent._state : '';
+    if (this.#popupSectionComponent) {
+      this.#scrollPosition = this.#popupSectionComponent.element.scrollTop;
+      this.#popupFormInfo = isSavingUserInfo ? this.#popupFormComponent._state : '';
+    }
     this.#changeData(userAction, updateType, movie, comment);
   }
 

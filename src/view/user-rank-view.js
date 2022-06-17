@@ -1,8 +1,9 @@
 import AbstractView from '../framework/view/abstract-view';
 import {UserRank, UserHistory} from '../const';
+import {getMoviesWatchedCount} from '../utils/movie';
 
 const createUserRankNameTemplate = (movies) => {
-  const watchedMoviesCount = movies.filter((movie) => movie.userDetails.alreadyWatched).length;
+  const watchedMoviesCount = getMoviesWatchedCount(movies);
   if (watchedMoviesCount >= UserHistory.MOVIE_BUFF) {
     return `<p class="profile__rating">${UserRank.MOVIE_BUFF}</p>`;
   } else if (watchedMoviesCount < UserHistory.MOVIE_BUFF && watchedMoviesCount >= UserHistory.FAN) {
@@ -30,5 +31,9 @@ export default class UserRankView extends AbstractView {
 
   get template() {
     return createUserRankTemplate(this.#movies);
+  }
+
+  isHistory() {
+    return getMoviesWatchedCount(this.#movies) !== 0;
   }
 }

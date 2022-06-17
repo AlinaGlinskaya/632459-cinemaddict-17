@@ -169,7 +169,9 @@ export default class MainPresenter {
     }
 
     this.#userRankComponent = new UserRankView(this.#moviesModel.movies);
-    render(this.#userRankComponent, siteHeaderElement);
+    if (this.#userRankComponent.isHistory()) {
+      render(this.#userRankComponent, siteHeaderElement);
+    }
 
     if (moviesCount === 0) {
       this.#moviesListEmptyComponent = new MoviesListEmptyView(this.#filterType);
@@ -227,6 +229,8 @@ export default class MainPresenter {
             moviePresenter.init(data);
           }
         });
+        this.#clearCommented();
+        this.#renderCommented();
         break;
       case UpdateType.MINOR:
         this.#clearMain({resetPresenters: false});
@@ -320,7 +324,7 @@ export default class MainPresenter {
     this.#renderMain();
   };
 
-  #clearMain = ({resetPresenters = true, resetRenderedMoviesCount = false, resetSortType = false} = {}) => {
+  #clearMain({resetPresenters = true, resetRenderedMoviesCount = false, resetSortType = false} = {}) {
     const moviesCount = this.movies.length;
 
     if (resetPresenters) {
@@ -356,5 +360,11 @@ export default class MainPresenter {
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
     }
-  };
+  }
+
+  #clearCommented() {
+    this.#moviesListContainerCommentedComponent.clear();
+  }
 }
+
+

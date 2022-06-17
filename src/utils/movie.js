@@ -35,4 +35,6 @@ const sortByRating = (movieA, movieB) => movieB.filmInfo.totalRating - movieA.fi
 
 const sortByCommentsAmount = (movieA, movieB) => movieB.comments.length - movieA.comments.length;
 
-export {humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins, sortByDate, sortByRating, sortByCommentsAmount, getRandomMovies, isRatingNull, isCommentsAmountNull};
+const getMoviesWatchedCount = (movies) => movies.filter((movie) => movie.userDetails.alreadyWatched).length;
+
+export {humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins, sortByDate, sortByRating, sortByCommentsAmount, getRandomMovies, isRatingNull, isCommentsAmountNull, getMoviesWatchedCount};
