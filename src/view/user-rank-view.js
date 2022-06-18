@@ -1,15 +1,11 @@
 import AbstractView from '../framework/view/abstract-view';
-import {UserRank, UserHistory} from '../const';
+import {getUserRank} from '../utils/movie';
 import {getWatchedMoviesCount} from '../utils/movie';
 
 const createUserRankNameTemplate = (movies) => {
   const watchedMoviesCount = getWatchedMoviesCount(movies);
-  if (watchedMoviesCount >= UserHistory.MOVIE_BUFF) {
-    return `<p class="profile__rating">${UserRank.MOVIE_BUFF}</p>`;
-  } else if (watchedMoviesCount < UserHistory.MOVIE_BUFF && watchedMoviesCount >= UserHistory.FAN) {
-    return `<p class="profile__rating">${UserRank.FAN}</p>`;
-  }
-  return `<p class="profile__rating">${UserRank.NOVICE}</p>`;
+  const userRank = getUserRank(watchedMoviesCount);
+  return `<p class="profile__rating">${userRank}</p>`;
 };
 
 const createUserRankTemplate = (watchedMovies) => {

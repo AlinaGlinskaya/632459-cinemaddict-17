@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {getRandomInteger} from '../utils/common';
+import {UserRank, UserHistory} from '../const';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
@@ -37,4 +38,13 @@ const sortByCommentsAmount = (movieA, movieB) => movieB.comments.length - movieA
 
 const getWatchedMoviesCount = (movies) => movies.filter((movie) => movie.userDetails.alreadyWatched).length;
 
-export {humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins, sortByDate, sortByRating, sortByCommentsAmount, getRandomMovies, getRatedMoviesCount, getCommentedMoviesCount, getWatchedMoviesCount};
+const getUserRank = (watchedMoviesCount) => {
+  if (watchedMoviesCount >= UserHistory.MOVIE_BUFF) {
+    return UserRank.MOVIE_BUFF;
+  } else if (watchedMoviesCount < UserHistory.MOVIE_BUFF && watchedMoviesCount >= UserHistory.FAN) {
+    return UserRank.FAN;
+  }
+  return UserRank.NOVICE;
+};
+
+export {humanizeMovieReleaseDate, humanizeMovieReleaseYearDate, humanizeCommentDate, getTimeFromMins, sortByDate, sortByRating, sortByCommentsAmount, getRandomMovies, getRatedMoviesCount, getCommentedMoviesCount, getWatchedMoviesCount, getUserRank};

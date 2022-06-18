@@ -235,7 +235,7 @@ export default class MainPresenter {
         this.#renderMostCommented();
         break;
       case UpdateType.MINOR:
-        this.#clearMain({resetRenderedMoviesCount: true, resetPresenters: false});
+        this.#clearMain({resetPresenters: false});
         this.#renderMain();
         this.#updatePopup(data);
         break;
