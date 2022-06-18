@@ -160,7 +160,7 @@ export default class PopupFormView extends AbstractStatefulView {
     this.#button = '.film-details__close-btn';
     this.#commentsModel = commentsModel;
     this._state = {...defaultState};
-    this.#setInputHandlers();
+    this.#setInputChangeHandlers();
   }
 
   get comments() {
@@ -178,74 +178,74 @@ export default class PopupFormView extends AbstractStatefulView {
   };
 
   _restoreHandlers = () => {
-    this.#setInputHandlers();
-    this.setClosePopupHandler(this._callback.closeClick);
-    this.setAddToWatchlistHandler(this._callback.watchlistClick);
-    this.setAddToWatchedHandler(this._callback.watchedClick);
-    this.setAddToFavoriteHandler(this._callback.favoriteClick);
-    this.setDeleteCommentHandlers(this._callback.deleteClick);
-    this.setAddCommentHandler(this._callback.addKeydown);
+    this.#setInputChangeHandlers();
+    this.setClosePopupClickHandler(this._callback.closeClick);
+    this.setAddToWatchlistClickHandler(this._callback.watchlistClick);
+    this.setAddToWatchedClickHandler(this._callback.watchedClick);
+    this.setAddToFavoriteClickHandler(this._callback.favoriteClick);
+    this.setDeleteCommentClickHandlers(this._callback.deleteClick);
+    this.setAddCommentKeyDownHandler(this._callback.addKeydown);
   };
 
-  #setInputHandlers() {
+  #setInputChangeHandlers() {
     this.element.addEventListener('change', this.#changeCommentHandler);
   }
 
-  setClosePopupHandler = (callback) => {
+  setClosePopupClickHandler = (callback) => {
     this._callback.closeClick = callback;
-    this.element.querySelector(this.#button).addEventListener('click', this.#closePopupHandler);
+    this.element.querySelector(this.#button).addEventListener('click', this.#closePopupClickHandler);
   };
 
-  #closePopupHandler = (evt) => {
+  #closePopupClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.closeClick();
   };
 
-  setAddToWatchlistHandler = (callback) => {
+  setAddToWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
-    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#addToWatchlistHandler);
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#addToWatchlistClickHandler);
 
   };
 
-  setAddToWatchedHandler = (callback) => {
+  setAddToWatchedClickHandler = (callback) => {
     this._callback.watchedClick = callback;
-    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#addToWatchedHandler);
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#addToWatchedClickHandler);
   };
 
-  setAddToFavoriteHandler = (callback) => {
+  setAddToFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
-    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#addToFavoriteHandler);
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#addToFavoriteClickHandler);
   };
 
-  setDeleteCommentHandlers = (callback) => {
+  setDeleteCommentClickHandlers = (callback) => {
     this._callback.deleteClick = callback;
     const buttons = this.element.querySelectorAll('.film-details__comment-delete');
     for (const button of buttons) {
-      button.addEventListener('click', this.#deleteCommentHandler);
+      button.addEventListener('click', this.#deleteCommentClickHandler);
     }
   };
 
-  setAddCommentHandler = (callback) => {
+  setAddCommentKeyDownHandler = (callback) => {
     this._callback.addKeydown = callback;
-    this.element.addEventListener('keydown', this.#addNewCommentHandler);
+    this.element.addEventListener('keydown', this.#addCommentKeyDownHandler);
   };
 
-  #addToWatchlistHandler = (evt) => {
+  #addToWatchlistClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchlistClick();
   };
 
-  #addToWatchedHandler = (evt) => {
+  #addToWatchedClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchedClick();
   };
 
-  #addToFavoriteHandler = (evt) => {
+  #addToFavoriteClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
   };
 
-  #deleteCommentHandler = (evt) => {
+  #deleteCommentClickHandler = (evt) => {
     evt.preventDefault();
     const commentId = evt.target.dataset.id;
     this._callback.deleteClick(this.#movie, commentId);
@@ -265,7 +265,7 @@ export default class PopupFormView extends AbstractStatefulView {
     }
   };
 
-  #addNewCommentHandler = (evt) => {
+  #addCommentKeyDownHandler = (evt) => {
     if (evt.ctrlKey && evt.keyCode === 13) {
       const comment = {
         author: 'Author',

@@ -34,13 +34,13 @@ export default class MoviePresenter {
 
     this.#movieCardComponent = new MovieCardView(movie, this.#movie.comments);
 
-    this.#movieCardComponent.setOpenPopupHandler(() => {
-      this.#onMovieClick();
+    this.#movieCardComponent.setOpenPopupClickHandler(() => {
+      this.#handleMovieClick();
     });
 
-    this.#movieCardComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
-    this.#movieCardComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
-    this.#movieCardComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
+    this.#movieCardComponent.setAddToWatchlistClickHandler(this.#handleAddToWatchlistClick);
+    this.#movieCardComponent.setAddToWatchedClickHandler(this.#handleAddToWatchedClick);
+    this.#movieCardComponent.setAddToFavoriteClickHandler(this.#handleAddToFavoriteClick);
 
     if (prevMovieCardComponent === null) {
       render(this.#movieCardComponent, this.#container.element);
@@ -59,20 +59,20 @@ export default class MoviePresenter {
     }
   }
 
-  #onMovieClick() {
+  #handleMovieClick() {
     this.openPopup();
   }
 
   #closePopup() {
     remove(this.#popupSectionComponent);
     this.#popupContainer.classList.remove('hide-overflow');
-    document.removeEventListener('keydown', this.#onEscKeyDown);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#popupSectionComponent = null;
   }
 
-  #onEscKeyDown = (evt) => {
+  #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      this.#closePopup(this.#onEscKeyDown);
+      this.#closePopup(this.#escKeyDownHandler);
     }
   };
 
@@ -87,15 +87,14 @@ export default class MoviePresenter {
     const prevPopupSectionComponent = this.#popupSectionComponent;
     this.#popupSectionComponent = new PopupSectionView();
     this.#popupFormComponent = new PopupFormView(this.#movie, comments, this.#commentsModel);
-    this.#popupFormComponent.setClosePopupHandler(this.#onClickClosePopup);
-    this.#popupFormComponent.setAddToWatchlistHandler(this.#onClickAddToWatchlist);
-    this.#popupFormComponent.setAddToWatchedHandler(this.#onClickAddToWatched);
-    this.#popupFormComponent.setAddToFavoriteHandler(this.#onClickAddToFavorite);
-    this.#popupFormComponent.setDeleteCommentHandlers(this.#onClickDeleteComment);
-    this.#popupFormComponent.setAddCommentHandler(this.#onKeyDownAddComment);
+    this.#popupFormComponent.setClosePopupClickHandler(this.#handleClosePopupClick);
+    this.#popupFormComponent.setAddToWatchlistClickHandler(this.#handleAddToWatchlistClick);
+    this.#popupFormComponent.setAddToWatchedClickHandler(this.#handleAddToWatchedClick);
+    this.#popupFormComponent.setAddToFavoriteClickHandler(this.#handleAddToFavoriteClick);
+    this.#popupFormComponent.setDeleteCommentClickHandlers(this.#handleDeleteCommentClick);
+    this.#popupFormComponent.setAddCommentKeyDownHandler(this.#handleAddCommentKeyDown);
     this.#popupContainer.classList.add('hide-overflow');
-    document.addEventListener('keydown', this.#onEscKeyDown);
-
+    document.addEventListener('keydown', this.#escKeyDownHandler);
 
     if (prevPopupSectionComponent === null) {
       render(this.#popupSectionComponent, this.#footerElement, RenderPosition.AFTEREND);
@@ -105,15 +104,15 @@ export default class MoviePresenter {
     }
   };
 
-  #onClickClosePopup = () => {
-    this.#closePopup(this.#onEscKeyDown);
+  #handleClosePopupClick = () => {
+    this.#closePopup(this.#escKeyDownHandler);
   };
 
   resetPopupView = () => {
     if (this.#popupSectionComponent === null) {
       return;
     }
-    this.#closePopup(this.#onEscKeyDown);
+    this.#closePopup(this.#escKeyDownHandler);
   };
 
   setSaving() {
@@ -139,7 +138,7 @@ export default class MoviePresenter {
     this.#changeData(userAction, updateType, movie, comment);
   }
 
-  #onClickAddToWatchlist = () => {
+  #handleAddToWatchlistClick = () => {
     this.#customUpdateElement(
       true,
       UserAction.UPDATE_MOVIE,
@@ -147,7 +146,7 @@ export default class MoviePresenter {
       {...this.#movie, userDetails: {...this.#movie.userDetails, watchlist: !this.#movie.userDetails.watchlist}});
   };
 
-  #onClickAddToWatched = () => {
+  #handleAddToWatchedClick = () => {
     this.#customUpdateElement(
       true,
       UserAction.UPDATE_MOVIE,
@@ -155,7 +154,7 @@ export default class MoviePresenter {
       {...this.#movie, userDetails: {...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails.alreadyWatched}});
   };
 
-  #onClickAddToFavorite = () => {
+  #handleAddToFavoriteClick = () => {
     this.#customUpdateElement(
       true,
       UserAction.UPDATE_MOVIE,
@@ -163,7 +162,7 @@ export default class MoviePresenter {
       {...this.#movie, userDetails: {...this.#movie.userDetails, favorite: !this.#movie.userDetails.favorite}});
   };
 
-  #onClickDeleteComment = (movie, comment) => {
+  #handleDeleteCommentClick = (movie, comment) => {
     this.#customUpdateElement(
       true,
       UserAction.DELETE_COMMENT,
@@ -171,7 +170,7 @@ export default class MoviePresenter {
       movie, comment);
   };
 
-  #onKeyDownAddComment = (movie, comment) => {
+  #handleAddCommentKeyDown = (movie, comment) => {
     this.#customUpdateElement(
       false,
       UserAction.ADD_COMMENT,

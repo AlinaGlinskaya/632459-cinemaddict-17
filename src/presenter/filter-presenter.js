@@ -15,8 +15,8 @@ export default class FilterPresenter {
     this.#filterModel = filterModel;
     this.#moviesModel = moviesModel;
 
-    this.#moviesModel.addObserver(this.#onModelEvent);
-    this.#filterModel.addObserver(this.#onModelEvent);
+    this.#moviesModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get filters() {
@@ -51,7 +51,7 @@ export default class FilterPresenter {
     const prevFilterComponent = this.#filterComponent;
 
     this.#filterComponent = new FiltersView(filters, this.#filterModel.filter);
-    this.#filterComponent.setFilterTypeChangeHandler(this.#onFilterTypeChange);
+    this.#filterComponent.setFilterTypeClickHandler(this.#handleFilterTypeClick);
 
     if (prevFilterComponent === null) {
       render(this.#filterComponent, this.#filterContainer);
@@ -62,11 +62,11 @@ export default class FilterPresenter {
     remove(prevFilterComponent);
   };
 
-  #onModelEvent = () => {
+  #handleModelEvent = () => {
     this.init();
   };
 
-  #onFilterTypeChange = (filterType) => {
+  #handleFilterTypeClick = (filterType) => {
     if (this.#filterModel.filter === filterType) {
       return;
     }

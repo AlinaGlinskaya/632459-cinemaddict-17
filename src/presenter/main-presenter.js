@@ -43,8 +43,8 @@ export default class MainPresenter {
     this.#commentsModel = commentsModel;
     this.#popupContainer = popupContainer;
 
-    this.#moviesModel.addObserver(this.#onModelEvent);
-    this.#filterModel.addObserver(this.#onModelEvent);
+    this.#moviesModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   #moviesComponent = new MoviesView();
@@ -96,7 +96,7 @@ export default class MainPresenter {
 
   #renderSorting() {
     this.#sortComponent = new SortView(this.#currentSortType);
-    this.#sortComponent.setSortTypeChangeHandler(this.#onClickSortTypeChange);
+    this.#sortComponent.setSortTypeClickHandler(this.#handleSortTypeClick);
     render(this.#sortComponent, this.#moviesContainer);
   }
 
@@ -116,7 +116,7 @@ export default class MainPresenter {
       return;
     }
 
-    const moviePresenter = new MoviePresenter(container, this.#footerElement, this.#onViewAction, this.#onClickPopupReset, this.#commentsModel, this.#popupContainer);
+    const moviePresenter = new MoviePresenter(container, this.#footerElement, this.#handleViewAction, this.#resetPopup, this.#commentsModel, this.#popupContainer);
     moviePresenter.init(movie);
     mapPresenters.set(movie.id, moviePresenter);
   }
@@ -124,7 +124,7 @@ export default class MainPresenter {
   #renderShowMoreButton() {
     this.#buttonShowMoreComponent = new ButtonShowMoreView();
     render(this.#buttonShowMoreComponent, this.#moviesListComponent.element);
-    this.#buttonShowMoreComponent.setShowMoviesHandler(this.#onClickShowMore);
+    this.#buttonShowMoreComponent.setShowMoviesClickHandler(this.#handleShowMoviesClick);
   }
 
   #renderMostRated() {
@@ -200,7 +200,7 @@ export default class MainPresenter {
     render(this.#moviesStatisticsComponent, siteFooterStatisticsElement);
   }
 
-  #onClickShowMore = () => {
+  #handleShowMoviesClick = () => {
     const moviesCount = this.movies.length;
     const newRenderedMoviesCount = Math.min(moviesCount, this.#renderedMoviesCount + MOVIES_COUNT_PER_STEP);
     const movies = this.movies.slice(this.#renderedMoviesCount, newRenderedMoviesCount);
@@ -222,7 +222,7 @@ export default class MainPresenter {
     });
   }
 
-  #onModelEvent = (updateType, data) => {
+  #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
         this.#moviePresenters.forEach((presenters) => {
@@ -238,7 +238,6 @@ export default class MainPresenter {
         this.#clearMain({resetPresenters: false});
         this.#renderMain();
         this.#updatePopup(data);
-
         break;
       case UpdateType.MAJOR:
         this.#clearMain({resetRenderedMoviesCount: true, resetSortType: true});
@@ -252,7 +251,7 @@ export default class MainPresenter {
     }
   };
 
-  #onViewAction = async (actionType, updateType, updateMovie, updateComment) => {
+  #handleViewAction = async (actionType, updateType, updateMovie, updateComment) => {
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
         this.#uiBlocker.block();
@@ -272,7 +271,6 @@ export default class MainPresenter {
         try {
           await this.#commentsModel.addComment(updateType, updateMovie, updateComment);
           await this.#moviesModel.updateMovie(updateType, updateMovie);
-          this.#uiBlocker.unblock();
         } catch(err) {
           this.#moviePresenters.forEach((presenters) => {
             if (presenters.has(updateMovie.id)) {
@@ -283,6 +281,7 @@ export default class MainPresenter {
             }
           });
         }
+        this.#uiBlocker.unblock();
         break;
       case UserAction.DELETE_COMMENT:
         this.#moviePresenters.forEach((presenters) => {
@@ -310,13 +309,13 @@ export default class MainPresenter {
     }
   };
 
-  #onClickPopupReset = () => {
+  #resetPopup = () => {
     this.#moviePresenters
       .forEach((map) => [...map.values()]
         .forEach((presenter) => presenter.resetPopupView()));
   };
 
-  #onClickSortTypeChange = (sortType) => {
+  #handleSortTypeClick = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
     }

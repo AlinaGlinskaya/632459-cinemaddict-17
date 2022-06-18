@@ -7,14 +7,14 @@ export default class ButtonShowMoreView extends AbstractView {
     return createButtonShowMoreTemplate();
   }
 
-  setShowMoviesHandler = (callback) => {
-    this._callback.click = callback;
+  setShowMoviesClickHandler = (callback) => {
+    this._callback.showMoviesClick = callback;
 
-    this.element.addEventListener('click', this.#showMoviesHandler);
+    this.element.addEventListener('click', this.#showMoviesClickHandler);
   };
 
-  #showMoviesHandler = (evt) => {
+  #showMoviesClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.showMoviesClick();
   };
 }
