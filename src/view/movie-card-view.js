@@ -1,6 +1,8 @@
 import AbstractView from '../framework/view/abstract-view';
 import {humanizeMovieReleaseYearDate, getTimeFromMins} from '../utils/movie';
 
+const MOVIE_DESCRIPTION_MAX_LENGTH = 140;
+
 const createMovieCardTemplate = (movie, comments) => {
   const {title, description, totalRating, poster, runtime, genre} = movie.filmInfo;
   const {date} = movie.filmInfo.release;
@@ -28,7 +30,7 @@ const createMovieCardTemplate = (movie, comments) => {
         <span class="film-card__genre">${genre[0]}</span>
       </p>
       <img src="${poster}" alt="" class="film-card__poster">
-      <p class="film-card__description">${descriptionLength < 140 ? description : `${description.substr(0, 139)}...`}</p>
+      <p class="film-card__description">${descriptionLength <= MOVIE_DESCRIPTION_MAX_LENGTH ? description : `${description.slice(0, (MOVIE_DESCRIPTION_MAX_LENGTH - 1))}...`}</p>
       <span class="film-card__comments">${commentsAmount} comments</span>
     </a>
     <div class="film-card__controls">

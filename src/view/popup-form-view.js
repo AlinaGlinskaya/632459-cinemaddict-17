@@ -3,6 +3,7 @@ import {humanizeMovieReleaseDate, humanizeCommentDate, getTimeFromMins} from '..
 import {EMOTIONS} from '../const.js';
 import he from 'he';
 
+const ENTER_KEY_CODE = 13;
 const defaultState = {comment: '', emotion: 'smile', isButtonDisabled: false, isFormDisabled: false, deletingId: ''};
 
 const createPopupFormTemplate = (movie, comments, formData) => {
@@ -266,7 +267,7 @@ export default class PopupFormView extends AbstractStatefulView {
   };
 
   #addCommentKeyDownHandler = (evt) => {
-    if (evt.ctrlKey && evt.keyCode === 13) {
+    if (evt.ctrlKey && evt.keyCode === ENTER_KEY_CODE) {
       const comment = {
         author: 'Author',
         date: new Date(),
